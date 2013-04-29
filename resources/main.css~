@@ -1,0 +1,109 @@
+@font-face {
+	font-family: 'wipeout';
+	src: url('wipeout-fusion-bold.ttf');
+}
+
+* {
+	transition-duration: .5s;
+	-moz-transition-duration: .5s; 	/* Firefox 4 */
+	-webkit-transition-duration: .5s; 	/* Safari and Chrome */
+	-o-transition-duration: .5s; 		/* Opera */
+}
+
+body {
+	width: 1200px;
+	margin: 0 auto;
+}
+
+header {
+	font-family: 'wipeout';
+	font-size: 200pt;
+	text-align: center;
+	line-height: 230px;
+	margin-bottom: 40;
+}
+
+nav ul {
+	padding: 0;
+}
+
+nav ul li {
+	display: block;
+	clear: none;
+	background: black;
+	color: white;
+	font-family: 'wipeout';
+	font-size: 25pt;
+	text-align: center;
+	float: left;
+	width: 400px;
+	line-height: 31px;
+	height: 35px;
+}
+
+canvas {
+	width: 1200px;
+}
+
+section {
+	padding: 10px 0 10px 0;
+	text-align: justify;
+	background: white;
+	font-family: 'Verdana';
+	clear: both;
+	columns: 3;
+	column-gap: 20px;
+	-moz-columns: 3;
+	-moz-column-gap: 20px;
+	-webkit-columns: 3;
+	-webkit-column-gap: 20px;
+	-o-columns: 3;
+	-o-column-gap: 20px;
+}
+section#game {
+	padding: 0;
+	columns: 1;
+	-moz-columns: 1;
+	-webkit-columns: 1;
+	-o-columns: 1;
+}
+
+p {
+	padding-bottom: 15px;
+	border-bottom: 2px dotted black;
+	font-size: 12pt;
+	
+}
+p.no-end {
+	padding-bottom: 0;
+	border-bottom: 0;
+}
+
+footer {
+	display: block;
+	clear: none;
+	background: black;
+	color: white;
+	font-family: 'wipeout';
+	font-size: 25pt;
+	text-align: center;
+	float: left;
+	width: 100%;
+	line-height: 31px;
+	height: 35px;
+}
+
+a {
+	text-decoration: none;
+	color: inherit;
+}
+a:hover{
+	color: red;
+}
+
+h2 {
+	font-family: 'wipeout';
+	font-size: 24pt;
+	color: red;
+	line-height: 15px;
+}

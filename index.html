@@ -1,0 +1,102 @@
+<html>
+	<head>
+        <link type='text/css' rel='stylesheet' href='resources/main.css'>
+        <link rel='icon' type='image/ico' href='resources/icon.ico'>
+        
+		<script>
+		
+			//	Google Analyics tracking ID	
+		
+			(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+			(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+			m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+			})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+			ga('create', 'UA-40441642-1', 'aber.ac.uk');
+			ga('send', 'pageview');
+
+		</script>	
+        
+        <title>
+        	ABOUT | TARGET
+        </title>	
+	</head>
+	<body>
+		<header>
+			TARGET
+		</header>
+		<nav>
+			<ul>
+				<li><a href='game.html'>GAME</a></li>
+				<li><a href='index.html'>ABOUT</a></li>
+				<li><a href='writeup.html'>WRITEUP</a></li>
+			</ul>					
+		</nav>		
+		<section>
+			<h2>
+				ABOUT THE GAME
+			</h2>
+			<p>
+				The game is a fast paced, bright & energetic action game. TARGET has a large number of increasingly difficult levels & there is a range of differently levelled achievements & it stores the user's high scores to encourage competition. It uses both the mouse & the keyboard for playing (though the latter mainly for menus). 
+			</p>
+			
+			<h2>
+				HOW TO PLAY
+			</h2>
+			<p class='no-end'>
+				You can find out how to play by pressing 'h' on the main menu. The idea of the game is stop incoming lines (threats) from reaching the <i>TARGET</i>. This is done by drawing your own lines (defenses) using the mouse - pressing the mouse button to start drawing a line, dragging and releasing to end & draw the line. The controls for each menu are detailed at the bottom of each screen.
+			</p>
+			<p>
+				As the levels change, the size of the <i>TARGET</i> changes & the rate at which new threats come in increases, as well as the speed of each threat. The game does has a difficulty spike after the twelfth level, but this is to make the achievement for getting to the fifteenth level more valuable. Implemented achievements are <i>SURVIVOR</i> for surviving a certain number of levels without losing a life and <i>COMPLETIONIST</i> for generally completing levels. There are different levels of each for each three levels.
+			</p>
+			<h2>
+				DESIGN OVERVIEW
+			</h2>
+			<p>
+				The game is written in a manner inspired by the Model View Controller design pattern, though it doesn't follow it to a key. This inspired the filenames of the JavaScript files & and the function names. The game uses an awful lot of loops (setInterval) for menus, animation and game mechanics in general, but maintains performance - critical in a fast paced game - by stopping each as soon as they're no longer needed.
+			</p>
+			
+			<h2>
+				SOUND
+			</h2>
+			<p class='no-end'>
+				The game uses open license music taken from <a href='http://freemusicarchive.org/'>Free Music Archive</a>. The game gives the user the option to mute music by pressing 'm' at any time, it might get repetitive the track listing is only four long:
+			</p>
+			<ul>
+				<li><i>Moves</i> by Sycamore Drive</li>
+				<li><i>Happiness</i> by Sycamore Drive</li>
+				<li><i>Computer Truck</i> by Euritmix Sux My Dix</li>
+				<li><i>Shiny spaceship</i> by 8-Bit Ninjas</li>
+			</ul>	
+			<p>
+				The game also makes use of sound effects, also with an open license, taken from <a href='http://www.freesound.org/'>Freesound</a>. These are used for <a href='http://www.freesound.org/people/xitherun/sounds/105020/'>destroying threats</a>, <a href='http://www.freesound.org/people/iut_Paris8/sounds/110569/'>levelling up</a>, <a href='http://freesound.org/people/soundnimja/sounds/173326/'>losing a life</a> & <a href='http://www.freesound.org/people/fins/sounds/133283/'>game over</a>. 
+			</p>
+			
+			<h2>
+				EXTERNAL SOURCES
+			</h2>
+			<p class='no-end'>
+				In terms of libraries, the game makes use of <a href='http://jquery.com/'>jQuery</a> & <a href='http://craig.is/killing/mice'>Mousetrap</a>. Both are linked from CDNs as these are likely to already be in the browser's cache (faster than hosting myself).
+			</p>
+			<p class='no-end'>
+				The game also uses the API of the <a href='http://www.colourlovers.com/'>Colourlovers</a> to get colour palettes to generate the styles for each level. This has its pros & cons - it means lots of possible nicely colour co-ordinated levels, but it can end up with very difficult levels due to contrast. It also is another dependency on another website & due to its asnychronous nature (limited by the fact it's cross-domain JSONP), it can make the game break if the player starts the game before it finishes loading.
+			</p>
+			<p>
+				Also thanks to <a href='http://users.aber.ac.uk/job36/cs25210/iwpgame/'>Joshua Bird</a> for ideas & technical discussion.
+			</p>
+			
+			<h2>
+				OTHER NOTES
+			</h2>
+			<p class='no-end'>
+				The game has been tested with recent versions Chromium, Chrome & Firefox - all of which find it working perfectly fine.
+			</p>
+			<p class='no-end'>
+				Validated HTML(5) & CSS.
+			</p>
+			
+		</section>		
+		<footer>
+			<a href='http://gideonjon.es'>GIDEONJON.ES</a> 2013
+		</footer>
+	</body>
+</html>
