@@ -88,3 +88,23 @@ function control_gui_menu_main() {
 		}
 	});
 }
+
+
+
+
+
+
+//	The start screen & control setting
+function control_gui_initialise() {
+	var start_handle = setInterval(view_draw_gui_start, 30);
+
+	Mousetrap.reset();
+
+	Mousetrap.bind('m', view_audio_toggle_mute);
+
+	canvas.onmousedown = function(e) {
+		canvas.onmousedown = null;
+		clearInterval(start_handle);
+		control_gui_menu_main();
+	};
+}

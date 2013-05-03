@@ -1,11 +1,11 @@
-var mouse = {	
+var mouse = {
 	start: {
 		x: 0,
 		y: 0
 	},
 	end: {
 		x: 0,
-		y: 0					
+		y: 0
 	},
 	down : false
 };
@@ -13,6 +13,9 @@ var mouse = {
 
 //	Starting the game, keyboard & mouse control settings
 function control_game_initialise() {
+	control_game();
+
+	/*
 	Mousetrap.unbind('esc');
 	Mousetrap.unbind('left');
 	Mousetrap.unbind('right');
@@ -23,20 +26,18 @@ function control_game_initialise() {
 	canvas.onmousemove = control_mouse_position_update;
 	canvas.onmousedown = control_game_mouse_down;
 	canvas.onmouseup   = control_game_mouse_up;
-	
+
 	Mousetrap.bind('esc', control_game_pause);
 	Mousetrap.bind('p', control_game_pause);
 	Mousetrap.bind('enter', control_game_pause);
+	*/
 }
 
 
-//	General mouse position updating, coordinates can be accessed through the mouse object
-function control_mouse_position_update(e) {				
-	if (e.pageX - canvas.offsetLeft < 0) mouse.end.x = canvas.width / 2 - (e.pageX - canvas.offsetLeft);		
-	else								 mouse.end.x = (e.pageX - canvas.offsetLeft) - canvas.width / 2;
-	
-	if (e.pageY - canvas.offsetTop < 0)	mouse.end.y = canvas.height / 2 - (e.pageY - canvas.offsetTop);
-	else								mouse.end.y = (e.pageY - canvas.offsetTop) - canvas.height / 2;
+// sets mouse object end coordinates, looks more complex than it actually is because the centre of the canvas is the origin
+function control_mouse_position_update(e) {
+	mouse.end.x = (e.pageX - canvas.offsetLeft < 0)	? canvas.width / 2 - (e.pageX - canvas.offsetLeft) : (e.pageX - canvas.offsetLeft) - canvas.width / 2;
+	mouse.end.y = (e.pageY - canvas.offsetTop < 0)	? canvas.height / 2 - (e.pageY - canvas.offsetTop) : (e.pageY - canvas.offsetTop) - canvas.height / 2;
 }
 
 
@@ -58,154 +59,17 @@ function control_game_defense_current() {
 
 
 //	Adds another set of coordinates to the array of lines
-function control_game_mouse_up(e) { 
-	if (e.which == 1) {						
+function control_game_mouse_up(e) {
+	if (e.which == 1) {
 		model_defense_add();
 		mouse.down = false;
 	}
 }
 
 
-var pause_handle;
-
-//	Game pausing & control setting
-function control_game_pause(e) {
-	if (game) {
-		game = false;
-		pause_handle = setInterval(view_draw_gui_pause, 30);
-		view_audio_music_pause();
-		Mousetrap.bind('esc', function(){
-			clearInterval(pause_handle);
-			control_gui_menu_main();
-		});
-		Mousetrap.bind('p', function() {
-			clearInterval(pause_handle);
-			game = true;
-			view_audio_music_play();
-			Mousetrap.bind('esc', control_game_pause);
-			Mousetrap.bind('p', control_game_pause);
-		});
-	} else {
-		clearInterval(pause_handle);
-		game = true;
-		view_audio_music_play();
-		Mousetrap.bind('esc', control_game_pause);
-		Mousetrap.bind('p', control_game_pause);
-	}	
-}
 
 
 
-
-
-//	The start screen & control setting
-function control_gui_initialise() {
-	var start_handle = setInterval(view_draw_gui_start, 30);
-
-	Mousetrap.unbind('left');
-	Mousetrap.unbind('right');
-	Mousetrap.unbind('enter');
-	
-	Mousetrap.bind('m', view_audio_toggle_mute);
-	
-	canvas.onmousedown = function(e) {
-		canvas.onmousedown = null;
-		clearInterval(start_handle);
-		control_gui_menu_main(); 
-	};
-}
-
-
-
-//	Control for the main menu
-function control_gui_menu_main() {
-	var menu_selection = 1; 
-	var menu_handle = setInterval(view_draw_gui_menu, 30);
-
-	canvas.onmousemove = function(e) {
-		if (!game) {
-			control_mouse_position_update(e);
-	
-			if (mouse.end.x < -canvas.width / 6) {
-				menu_selection = 0;
-			
-				clearInterval(menu_handle);
-				menu_handle = setInterval(function() {
-					view_draw_gui_menu(menu_selection); 
-				}, 30);
-		
-			} else if ((mouse.end.x < canvas.width / 6) && (mouse.end.x > -canvas.width / 6)) {
-				menu_selection = 1;
-			
-				clearInterval(menu_handle);
-				menu_handle = setInterval(function() {
-					view_draw_gui_menu(menu_selection); 
-				}, 30);
-			
-			} else if (mouse.end.x > canvas.width / 6) {
-				menu_selection = 2;
-			
-				clearInterval(menu_handle);
-				menu_handle = setInterval(function() {
-					view_draw_gui_menu(menu_selection); 
-				}, 30);
-			}
-		}
-	};
-	
-	//	Click to start
-	canvas.onmousedown = function(e) {
-		Mousetrap.trigger('enter');
-	};
-	
-	Mousetrap.unbind('esc');
-
-	//	Keyboard controls for menu, uses anonymous functions to pass param of which one is selected
-	Mousetrap.bind('left', function(e) { 
-		if (!game) {
-			(menu_selection < 1) ? menu_selection = 2 : --menu_selection;
-	
-			clearInterval(menu_handle);
-			menu_handle = setInterval(function() {
-				view_draw_gui_menu(menu_selection); 
-			}, 30);
-		}
-	});
-
-	Mousetrap.bind('right', function(e) { 
-		if (!game) {
-			(menu_selection > 1) ? menu_selection = 0 : ++menu_selection;
-	
-			clearInterval(menu_handle);
-			menu_handle = setInterval(function() {
-				view_draw_gui_menu(menu_selection);
-			}, 30);
-		}
-	});
-
-	Mousetrap.bind('enter', function(e) {
-		if (!game) {
-			clearInterval(menu_handle);
-			canvas.onmousemove = null;
-			canvas.onmousedown = null;
-		
-			if 		(menu_selection == 0) control_gui_page('ACHIEVEMENTS');
-			else if (menu_selection == 1) model_initialise();
-			else if (menu_selection == 2) control_gui_page('HIGH SCORES');
-		} 
-	});
-	
-	Mousetrap.bind('h', function() {
-
-		if(!game) {
-			control_gui_page('HELP');
-	 		canvas.onmousemove = null;
-			canvas.onmousedown = null;
-		
-			clearInterval(menu_handle);
-		}
-	});
-}
 
 
 
@@ -216,12 +80,12 @@ function control_gui_page(page) {
 		else if (page == 'ACHIEVEMENTS') view_draw_gui_achievements(achievements_get());
 		else if (page == 'HELP')		 view_draw_gui_help();
 	}, 30);
-	
+
 	Mousetrap.bind('d', function() {
 		if (page == 'HIGH SCORES')  achievements_high_scores_clear();
 		if (page == 'ACHIEVEMENTS') achievements_clear();
 	});
-	
+
 	Mousetrap.unbind('h');
 	Mousetrap.unbind('left');
 	Mousetrap.unbind('right');
@@ -230,7 +94,7 @@ function control_gui_page(page) {
 		clearInterval(page_handle);
 		control_gui_menu_main();
 	});
-	
+
 	canvas.onmousedown = function(e) {
 		Mousetrap.trigger('esc');
 	}
@@ -243,10 +107,10 @@ function control_gui_game_over(level, score) {
 	var game_over_handle = setInterval(function() {
 		view_draw_gui_game_over(level, score, achievements_high_scores_check(score));
 	}, 30);
-	
+
 	view_audio_music_pause();
 	view_audio_effects_play(2);
-	
+
 	Mousetrap.unbind('left');
 	Mousetrap.unbind('right');
 	Mousetrap.unbind('esc');
@@ -255,10 +119,133 @@ function control_gui_game_over(level, score) {
 		clearInterval(game_over_handle);
 		control_gui_menu_main();
 	});
-	
+
 	canvas.onmousedown = function() {
 		clearInterval(game_over_handle);
-		canvas.onmousedown = null;	
+		canvas.onmousedown = null;
 		control_gui_menu_main();
 	};
+}
+
+
+
+
+
+
+
+
+
+//	Game pausing & control setting
+function control_game_pause(e) {
+	if (game) {
+		game = false;
+
+		control_menu('PAUSE', [{
+			key: 'esc',
+			description: 'RETURN TO MENU',
+			functionality: function() {
+				clearInterval(control_menu_handle);
+				control_gui_menu_main();
+			}
+		}, {
+			key: 'p',
+			description: 'UNPAUSE',
+			functionality: function() {
+				game = true;
+				clearInterval(control_menu_handle);
+			}
+		}], null);
+
+	} else {
+		clearInterval(control_menu_handle);
+		game = true;
+	}
+}
+
+
+
+// control setting for the game
+function control_game() {
+	clearInterval(control_menu_handle);
+
+	Mousetrap.reset();
+	Mousetrap.bind('p', control_game_pause);
+	Mousetrap.bind('esc', control_game_pause);
+	Mousetrap.bind('m', view_audio_toggle_mute);
+
+	canvas.onmousemove = control_mouse_position_update;
+	canvas.onmousedown = control_game_mouse_down;
+	canvas.onmouseup   = control_game_mouse_up;
+}
+
+
+
+
+
+
+
+function control_menu_main() {
+
+
+	console.log('menu');
+}
+
+
+
+
+
+
+
+
+
+var control_menu_handle;
+
+/*
+ * draws a menu screen based on the parameters, maximum of three menu options
+ * resets controls and sets new ones, automatically does arrow keys & enter for menus
+ * rather flexible
+ *
+ * @param	title				the title of the menu
+ * @param	menu_options		object describing menu options	{selected : index, options : [{title : string, functionality: function}]}
+ * @param	keyboard_controls	object describing menu controls	[{key : string, description: string, functionality : function}]
+ * @param	mouse_controls		object describing menu controls	{mousedown : function, mouseup : function, mousemove : function}
+ */
+function control_menu(title, menu_options, keyboard_controls, mouse_controls) {
+
+	// resetting
+	clearInterval(control_menu_handle);
+	Mousetrap.reset();
+
+	// setting or nullifying mouse controls
+	if (mouse_controls != null) {
+		canvas.onmousedown =	(mouse_controls.onmousedown != undefined) 	? mouse_controls.mousedown : null;
+		canvas.onmouseup = 		(mouse_controls.onmouseup != undefined) 	? mouse_controls.onmouseup : null;
+		canvas.onmousemove =	(mouse_controls.onmousemove != undefined) 	? mouse_controls.onmousemove : null;
+	}
+	// control setting
+	if (keyboard_controls != null) {
+		for (var i = 0; i < keyboard_controls.length; i++) {
+			Mousetrap.bind(keyboard_controls[i].key, keyboard_controls[i].functionality);
+		}
+	}
+
+	// automatically setting menu keyboard controls if there are menu options
+	if (menu_options != null) {
+		Mousetrap.bind('left', function() {
+			menu_options.selected = (menu_options.selected < 1) ? menu_options.options.length - 1 : menu_options.selected - 1;
+		});
+
+		Mousetrap.bind('right', function() {
+			menu_options.selected = (menu_options.selected < 1) ? 0 : menu_options.selected + 1;
+		});
+
+		Mousetrap.bind('enter', menu_options.options[menu_options.selected].functionality);
+	}
+
+
+
+	// draw loop setting
+	control_menu_handle = setInterval(function() {
+		view_draw_gui(title, menu_options, keyboard_controls);
+	}, 30);
 }

@@ -2,50 +2,52 @@
 //	Also handles music, generally the appearance of the game
 
 
-//	Defaulting
-var level_shift = {	
-	defenses	  : [0, 0, 0, 0],
-	target: {
-		size	  : 20,
-		ring_1	  : [0, 0, 0, 0],
-		ring_2	  : [0, 0, 0, 0]
+// defaulting & structure definition
+var level_shift = {
+	target : {
+		size   : 20,
+		ring_1 : [0, 0, 0, 0],
+		ring_2 : [0, 0, 0, 0]
 	},
-	threats		  : [0, 0, 0, 0],
+	lines : {
+		threats	 : [0, 0, 0, 0],
+		defenses : [0, 0, 0, 0]
+	},
 	gui: {
-		background: [0, 0, 0, 0],
-		text	  : [0, 0, 0, 0]
+		background : [0, 0, 0, 0],
+		text	   : [0, 0, 0, 0]
 	},
-	timer		  : 0
+	timer : 0
 }
 
 //	Temp variables for target arcs spinning
-var target = {	
-	ring_1: 0,				
+var target = {
+	ring_1: 0,
 	ring_2: 0,
 	pulse : 0,
 	up	  : true
 };
 
 var audio = {
-	tracks        : [],		
-	tracks_current: 0,		
+	tracks        : [],
+	tracks_current: 0,
 	effects 	  : [],		//	Level up, threat destroy, game over, life lost
-	mute		  : false	
+	mute		  : false
 };
 
 //	Constructing the tracks & effects arrays in the audio object from the html elements
 function view_audio_initialise() {
 	for (var i = 0; i < 4; i++) audio.tracks.push(document.getElementsByTagName('audio')[i]);
-	for (var i = 4; i < 8; i++) audio.effects.push(document.getElementsByTagName('audio')[i]);	
+	for (var i = 4; i < 8; i++) audio.effects.push(document.getElementsByTagName('audio')[i]);
 }
 
 
 //	Plays an index from tracks array in the audio object, if no index specified, falls back to the last played
-function view_audio_music_play(index) {	
+function view_audio_music_play(index) {
 	if (index != null) audio.tracks_current = index;
-	
+
 	if (debug) if (debug) if (debug) if (debug) console.log('audio track ' + audio.tracks_current);
-	
+
 	audio.tracks[audio.tracks_current].play();
 }
 
@@ -91,7 +93,7 @@ function view_draw_initialise() {
 function view_draw_canvas() {
 	if (level_data.length == 0) canvas.style.background = 'rgba(0, 0, 0, 1.0)';
 	else						canvas.style.background = view_get_shifted_rgba(level_data[level].style.gui.background, level_shift.gui.background);
-	
+
 	context.beginPath();
 	context.save();
 	context.setTransform(1, 0, 0, 1, 0, 0);
@@ -116,37 +118,37 @@ function view_draw_target() {
 
 	var size = level_data[level].style.target.size + Math.ceil(level_shift.target.size * level_shift.timer) + target.pulse;
 
-	context.strokeStyle = view_get_shifted_rgba(level_data[level].style.target.ring_1, level_shift.target.ring_1);	
+	context.strokeStyle = view_get_shifted_rgba(level_data[level].style.target.ring_1, level_shift.target.ring_1);
 	context.beginPath();
 	context.arc(0, 0, size, target.ring_1 += Math.PI / 30, target.ring_1 + Math.PI);
-	context.stroke();	
-	context.closePath();	
-	
+	context.stroke();
+	context.closePath();
+
 	context.strokeStyle = view_get_shifted_rgba(level_data[level].style.target.ring_2, level_shift.target.ring_2);
 	context.beginPath();
-	
+
 	//	Too small rings can cause invalid parameter issues
-	if (size < 20)	context.arc(0, 0, size + 10, target.ring_2 -= Math.PI / 30, target.ring_2 + Math.PI);	
+	if (size < 20)	context.arc(0, 0, size + 10, target.ring_2 -= Math.PI / 30, target.ring_2 + Math.PI);
 	else			context.arc(0, 0, size - 10, target.ring_2 -= Math.PI / 30, target.ring_2 + Math.PI);
-	
-	context.stroke();	
+
+	context.stroke();
 	context.closePath();
 }
 
 
 //	Incoming lines
-function view_draw_threats(i) {							
-	context.strokeStyle = view_get_shifted_rgba(level_data[level].style.threats, level_shift.threats);
-	
+function view_draw_threats(i) {
+	context.strokeStyle = view_get_shifted_rgba(level_data[level].style.lines.threats, level_shift.lines.threats);
+
 	//	Maximum distance from the center, for line length, pythagoras
 	var trig = (((canvas.width / 2) ^ 2) + ((canvas.height / 2) ^ 2)) ^ .5;
-	
+
 	for (var i = 0; i < threats.length; i++) {
 		context.beginPath();
 		context.moveTo(Math.cos(threats[i].angle) * trig, 				 Math.sin(threats[i].angle) * trig);
 		context.lineTo(Math.cos(threats[i].angle) * threats[i].distance, Math.sin(threats[i].angle) * threats[i].distance);
-		context.stroke();			
-		context.closePath();		
+		context.stroke();
+		context.closePath();
 	}
 }
 
@@ -161,15 +163,15 @@ function view_draw_defense_current(start_x, start_y, end_x, end_y) {
 
 //	Lines the player draws
 function view_draw_defenses() {
-	context.strokeStyle = view_get_shifted_rgba(level_data[level].style.defenses, level_shift.defenses);
-		
+	context.strokeStyle = view_get_shifted_rgba(level_data[level].style.lines.defenses, level_shift.lines.defenses);
+
 	for (var i = 0; i < defenses.length; i++) {
 		context.beginPath();
 		context.moveTo(defenses[i].start.x, defenses[i].start.y);
 		context.lineTo(defenses[i].end.x, 	defenses[i].end.y);
 		context.stroke();
 		context.closePath();
-	}		
+	}
 }
 
 
@@ -177,17 +179,17 @@ function view_draw_defenses() {
 function view_level_shift(duration) {
 	//	Constructing an object of the difference between colours, four for four channels - RGBA
 	for (var i = 0; i < 4; i++) {
-		level_shift.defenses[i] 	  = (level_data[level - 1].style.defenses[i] 	   - level_data[level].style.defenses[i])    	/ duration;
-		level_shift.target.size[i] 	  = (level_data[level - 1].style.target.size[i]    - level_data[level].style.target.size[i])    / duration;
+		level_shift.target.size[i] 	  = (level_data[level - 1].style.target.size[i]    - level_data[level].style.target.size[i])	/ duration;
 		level_shift.target.ring_1[i]  = (level_data[level - 1].style.target.ring_1[i]  - level_data[level].style.target.ring_1[i])	/ duration;
 		level_shift.target.ring_2[i]  = (level_data[level - 1].style.target.ring_2[i]  - level_data[level].style.target.ring_2[i])	/ duration;
-		level_shift.threats[i] 	   	  = (level_data[level - 1].style.threats[i] 	   - level_data[level].style.threats[i])		/ duration;
-		level_shift.gui.background[i] = (level_data[level - 1].style.gui.background[i] - level_data[level].style.gui.background[i]) / duration;
+		level_shift.lines.defenses[i] = (level_data[level - 1].style.lines.defenses[i] - level_data[level].style.lines.defenses[i])	/ duration;
+		level_shift.lines.threats[i]  = (level_data[level - 1].style.lines.threats[i]  - level_data[level].style.lines.threats[i])	/ duration;
+		level_shift.gui.background[i] = (level_data[level - 1].style.gui.background[i] - level_data[level].style.gui.background[i])	/ duration;
 		level_shift.gui.text[i]	   	  = (level_data[level - 1].style.gui.text[i] 	   - level_data[level].style.gui.text[i])	 	/ duration;
 	}
-	
+
 	level_shift.timer = duration;
-	
+
 	if (debug) {
 		if (debug) if (debug) if (debug) console.log('level shift calculation: current/previous/shift: ');
 		if (debug) if (debug) if (debug) console.log(level_data[level].style);
@@ -230,10 +232,10 @@ var gui = {
 
 function view_draw_gui_start() {
 	view_draw_gui_header('TARGET', true);
-	
-	//	Selected item pulsing	
+
+	//	Selected item pulsing
 	(gui.up) ? ((gui.pulse != 255) ? gui.pulse += 15 : gui.up = false) : ((gui.pulse != 000) ? gui.pulse -= 15 : gui.up = true);
-	
+
 	context.fillStyle = 'rgba(' + gui.pulse +', 000, 000, 1.0)';
 	context.fillText('CLICK TO START', 0, 100);
 }
@@ -247,27 +249,27 @@ function view_draw_gui_menu(selection) {
 
 	//	Selected item pulsing set by selection if statements
 	(gui.up) ? ((gui.pulse != 255) ? gui.pulse += 15 : gui.up = false) : ((gui.pulse != 000) ? gui.pulse -= 15 : gui.up = true);
-	
+
 	if (selection == 0)	context.fillStyle = 'rgba(' + gui.pulse + ', 000, 000, .75)';
-	
+
 	context.textAlign = 'left';
 	context.font = '25px wipeout';
 	context.fillText('ACHIEVEMENTS', -400, 100);
-	
+
 	if (selection == 0) context.fillStyle = 'rgba(255, 255, 255, 1.0)';
 	if (selection == 1) context.fillStyle = 'rgba(' + gui.pulse + ', 000, 000, .75)';
-	
+
 	context.textAlign = 'center';
 	context.font = '25px wipeout';
 	context.fillText('START', 0, 100);
-	
+
 	if (selection == 1) context.fillStyle = 'rgba(255, 255, 255, 1.0)';
 	if (selection == 2) context.fillStyle = 'rgba(' + gui.pulse + ', 000, 000, .75)';
-	
+
 	context.textAlign = 'right';
 	context.font = '25px wipeout';
 	context.fillText('HIGH SCORES', 400, 100);
-	
+
 	view_draw_gui_footer('H: HELP', 'ESC: MENU','M: MUTE MUSIC', 'ENTER: SELECT');
 }
 
@@ -280,7 +282,7 @@ function view_draw_gui_achievements(achievements) {
 
 	context.textAlign = 'left';
 	for (var i = 0, j = (-canvas.height * .5) + (canvas.height * .1); i < achievements.length; i++, j += 30) context.fillText(achievements[i].description, -canvas.width * .35, j);
-		
+
 	context.textAlign = 'right';
 	for (var i = 0, j = (-canvas.height * .5) + (canvas.height * .1); i < achievements.length; i++, j += 30) context.fillText(achievements[i].data, canvas.width * .35, j);
 
@@ -291,7 +293,7 @@ function view_draw_gui_achievements(achievements) {
 //	Draws the screen displaying high scores
 function view_draw_gui_high_scores(high_scores) {
 	view_draw_gui_header('HIGH SCORES', false);
-	
+
 	context.textBaseline = 'top';
 
 	if (high_scores.scores != null) {
@@ -304,7 +306,7 @@ function view_draw_gui_high_scores(high_scores) {
 	} else {
 		context.fillText('NO HIGH SCORES', 0, 0);
 	}
-	
+
 	view_draw_gui_footer('', 'ESC: MENU', '', 'D: RESET HIGH SCORES');
 }
 
@@ -314,10 +316,10 @@ function view_draw_gui_game_over(level, score, high_score) {
 	view_draw_gui_header('GAME OVER', true);
 
 	(gui.up) ? ((gui.pulse != 255) ? gui.pulse += 15 : gui.up = false) : ((gui.pulse != 000) ? gui.pulse -= 15 : gui.up = true);
-		
+
 	if (high_score) context.fillText('HIGH SCORE! ' + score, 0, 50);
 	else			context.fillText(score, 0, 50);
-	
+
 	context.fillStyle = 'rgba(' + gui.pulse + ', 000, 000, .75)';
 	context.fillText('RETURN TO MENU', 0, 100);
 }
@@ -334,7 +336,7 @@ function view_draw_gui_help() {
 	context.fillText(' BY CLICKING  AND DRAGGING WITH THE MOUSE', 0, 110);
 	context.fillText('TO DRAW YOUR OWN INES TO BLOCK THEM ', 0, 140);
 
-	view_draw_gui_footer('', 'ESC: MENU', '', '');	
+	view_draw_gui_footer('', 'ESC: MENU', '', '');
 }
 
 
@@ -345,33 +347,36 @@ function view_draw_gui_hud(level, lives, score) {
 
 	if ((level > 1) && (level_shift.timer > 0)){
 		level_shift.timer--;
-		
+
 		context.fillStyle = view_get_shifted_rgba(level_data[level].style.gui.text, level_shift.gui.text);
 		context.textAlign = 'center';
 		context.textBaseline = 'bottom';
 
 		context.fillText('LEVEL UP!', 0, (canvas.height * .5) - 40);
-	}	
+	}
 }
 
 
 //	Draws the level up screen
 function view_draw_gui_pause() {
 	view_draw_gui_header('PAUSE', true);
-	
+
 	(gui.up) ? ((gui.pulse != 255) ? gui.pulse += 15 : gui.up = false) : ((gui.pulse != 000) ? gui.pulse -= 15 : gui.up = true);
 	context.fillStyle = 'rgba(' + gui.pulse + ', 000, 000, .75)';
-	
+
 	context.fillText('CONTINUE', 0, 100);
-	
+
 	view_draw_gui_footer('', 'ESC: MENU', '', 'ENTER: SELECT');
 }
 
 
 
 
-//	Draws the header of a gui screen - moving background text of title, title_display is whether the title is boldly displayed or not
-function view_draw_gui_header(title, title_display) {
+
+
+
+// draws the header of a gui screen - moving background text of title, title_display is whether the title is boldly displayed or not
+function view_draw_header(title, title_display) {
 	if (++gui.shift_1 > +canvas.width * .8) gui.shift_1 = -canvas.width;
 	if (--gui.shift_2 < -canvas.width * .8) gui.shift_2 = canvas.width;
 
@@ -379,13 +384,13 @@ function view_draw_gui_header(title, title_display) {
 
 	context.fillStyle = 'rgba(000, 000, 000, 1.0)';
 	context.fillRect(-canvas.width * .5, -canvas.height * .4, canvas.width, canvas.height * .8);
-	
+
 	context.fillStyle = 'rgba(255, 255, 255, .75)';
 	context.textAlign = 'center';
 	context.textBaseline = 'center';
 	context.font = '150px wipeout';
 	if (title_display) context.fillText(title, 0, 0);
-	
+
 	context.fillStyle = 'rgba(255, 255, 255, 0.25)';
 	context.fillText(title, gui.shift_1, 50);
 	context.fillText(title, gui.shift_2, -50);
@@ -395,8 +400,8 @@ function view_draw_gui_header(title, title_display) {
 }
 
 
-//	Draws the footer of the screen displaying the strings passed
-function view_draw_gui_footer(one, two, three, four) {
+// draws the footer of the screen displaying the strings passed
+function view_draw_footer(one, two, three, four) {
 	context.textAlign = 'center';
 	context.textBaseline = 'bottom';
 	context.font = '25px wipeout';
@@ -412,4 +417,73 @@ function view_draw_gui_footer(one, two, three, four) {
 	context.textAlign = 'left';
 	context.fillText(three, canvas.width * .25, canvas.height * .5);
 	context.fillText(four, canvas.width / 16, canvas.height * .5);
+}
+
+
+function view_draw_options(menu_options) {
+	if (menu_options != null) {
+
+		context.textAlign = 'left';
+		context.font = '25px wipeout';
+		context.fillText((menu_options.options[0] != undefined) ? menu_options.options[0].title : '', -400, 100);
+
+		if (menu_options.selected  == 0) context.fillStyle = 'rgba(255, 255, 255, 1.0)';
+		if (menu_options.selected == 1) context.fillStyle = 'rgba(' + gui.pulse + ', 0, 0, .75)';
+
+		context.textAlign = 'center';
+		context.font = '25px wipeout';
+		context.fillText((menu_options.options[1] != undefined) ? menu_options.options[1].title : '', 0, 100);
+
+		if (menu_options.selected == 1) context.fillStyle = 'rgba(255, 255, 255, 1.0)';
+		if (menu_options.selected == 2) context.fillStyle = 'rgba(' + gui.pulse + ', 0, 0, .75)';
+
+		context.textAlign = 'right';
+		context.font = '25px wipeout';
+		context.fillText((menu_options.options[2] != undefined) ? menu_options.options[2].title : '', 400, 100);
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function view_draw_gui(title, menu_options, keyboard_controls) {
+
+	var control_hints = [];
+
+	// drawing hints in the footer for keyboard controls
+	if (menu_options != null) {
+		for (var i = 0; i < 4; i++) {
+			keyboard_controls[i] = (keyboard_controls[i] != undefined) ? keyboard_controls[i].key + ': ' + keyboard_controls[i].description : null;
+		}
+	}
+	// pulsing
+	(gui.up) ? ((gui.pulse != 255) ? gui.pulse += 15 : gui.up = false) : ((gui.pulse != 000) ? gui.pulse -= 15 : gui.up = true);
+
+	view_draw_header(title, true);
+	view_draw_options(menu_options);
+	view_draw_footer(control_hints[0], control_hints[1], control_hints[2], control_hints[3]);
 }
