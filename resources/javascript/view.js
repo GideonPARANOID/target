@@ -422,24 +422,27 @@ function view_draw_footer(one, two, three, four) {
 
 function view_draw_options(menu_options) {
 	if (menu_options != null) {
+		context.fillStyle = 'rgba(255, 255, 255, 1.0)';
+
+		if (menu_options.selected == 0) context.fillStyle = 'rgba(' + gui.pulse + ', 0, 0, .75)';
 
 		context.textAlign = 'left';
 		context.font = '25px wipeout';
-		context.fillText((menu_options.options[0] != undefined) ? menu_options.options[0].title : '', -400, 100);
+		context.fillText((menu_options.options[0] == undefined) ? '' : menu_options.options[0].title, -400, 100);
 
-		if (menu_options.selected  == 0) context.fillStyle = 'rgba(255, 255, 255, 1.0)';
+		if (menu_options.selected == 0) context.fillStyle = 'rgba(255, 255, 255, 1.0)';
 		if (menu_options.selected == 1) context.fillStyle = 'rgba(' + gui.pulse + ', 0, 0, .75)';
 
 		context.textAlign = 'center';
 		context.font = '25px wipeout';
-		context.fillText((menu_options.options[1] != undefined) ? menu_options.options[1].title : '', 0, 100);
+		context.fillText((menu_options.options[1] == undefined) ? '' : menu_options.options[1].title, 0, 100);
 
 		if (menu_options.selected == 1) context.fillStyle = 'rgba(255, 255, 255, 1.0)';
 		if (menu_options.selected == 2) context.fillStyle = 'rgba(' + gui.pulse + ', 0, 0, .75)';
 
 		context.textAlign = 'right';
 		context.font = '25px wipeout';
-		context.fillText((menu_options.options[2] != undefined) ? menu_options.options[2].title : '', 400, 100);
+		context.fillText((menu_options.options[2] == undefined) ? '' : menu_options.options[2].title, 400, 100);
 	}
 }
 
@@ -472,16 +475,16 @@ function view_draw_options(menu_options) {
 
 function view_draw_gui(title, menu_options, keyboard_controls) {
 
-	var control_hints = [];
+	var control_hints = ['', '', '', ''];
 
 	// drawing hints in the footer for keyboard controls
-	if (menu_options != null) {
+	if (keyboard_controls != null) {
 		for (var i = 0; i < 4; i++) {
-			keyboard_controls[i] = (keyboard_controls[i] != undefined) ? keyboard_controls[i].key + ': ' + keyboard_controls[i].description : null;
+			keyboard_hints[i] = (keyboard_controls[i] == undefined) ? null : keyboard_controls[i].key + ': ' + keyboard_controls[i].description;
 		}
 	}
 	// pulsing
-	(gui.up) ? ((gui.pulse != 255) ? gui.pulse += 15 : gui.up = false) : ((gui.pulse != 000) ? gui.pulse -= 15 : gui.up = true);
+	(gui.up) ? ((gui.pulse == 255) ? gui.up = false : gui.pulse += 15) : ((gui.pulse == 0) ? gui.up = true : gui.pulse -= 15);
 
 	view_draw_header(title, true);
 	view_draw_options(menu_options);

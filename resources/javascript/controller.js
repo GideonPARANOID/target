@@ -181,11 +181,30 @@ function control_game() {
 
 
 
+function control_menu_achievements() {
 
+}
+
+function control_menu_high_scores() {
+
+}
 
 
 function control_menu_main() {
-
+	control_menu('TARGET', {
+		selected : 1,
+		options : [{
+			title : 'ACHIEVEMENTS',
+			functionality : control_menu_achievements
+		}, {
+			title : 'PLAY',
+			functionality : control_game_initialise
+		}, {
+			title : 'HIGH SCORES',
+			functionality : control_menu_high_scores
+		}]},
+		null,
+		null);
 
 	console.log('menu');
 }
@@ -213,14 +232,13 @@ var control_menu_handle;
 function control_menu(title, menu_options, keyboard_controls, mouse_controls) {
 
 	// resetting
-	clearInterval(control_menu_handle);
 	Mousetrap.reset();
 
 	// setting or nullifying mouse controls
 	if (mouse_controls != null) {
-		canvas.onmousedown =	(mouse_controls.onmousedown != undefined) 	? mouse_controls.mousedown : null;
-		canvas.onmouseup = 		(mouse_controls.onmouseup != undefined) 	? mouse_controls.onmouseup : null;
-		canvas.onmousemove =	(mouse_controls.onmousemove != undefined) 	? mouse_controls.onmousemove : null;
+		canvas.onmousedown	= (mouse_controls.onmousedown == undefined)	? null : mouse_controls.mousedown;
+		canvas.onmouseup	= (mouse_controls.onmouseup == undefined)	? null : mouse_controls.onmouseup;
+		canvas.onmousemove	= (mouse_controls.onmousemove == undefined)	? null : mouse_controls.onmousemove;
 	}
 	// control setting
 	if (keyboard_controls != null) {
@@ -233,19 +251,25 @@ function control_menu(title, menu_options, keyboard_controls, mouse_controls) {
 	if (menu_options != null) {
 		Mousetrap.bind('left', function() {
 			menu_options.selected = (menu_options.selected < 1) ? menu_options.options.length - 1 : menu_options.selected - 1;
+			refresh_loop();
 		});
 
 		Mousetrap.bind('right', function() {
-			menu_options.selected = (menu_options.selected < 1) ? 0 : menu_options.selected + 1;
+			menu_options.selected = (menu_options.selected > 2) ? 0 : menu_options.selected + 1;
+			refresh_loop();
 		});
 
 		Mousetrap.bind('enter', menu_options.options[menu_options.selected].functionality);
+		refresh_loop();
 	}
 
+	function refresh_loop() {
+		clearInterval(control_menu_handle);
 
+		control_menu_handle = setInterval(function() {
+			view_draw_gui(title, menu_options, keyboard_controls);
+		}, 30);
+	}
 
-	// draw loop setting
-	control_menu_handle = setInterval(function() {
-		view_draw_gui(title, menu_options, keyboard_controls);
-	}, 30);
+	refresh_loop();
 }
