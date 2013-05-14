@@ -51,25 +51,6 @@ function control_game_mouse_up(e) {
 
 
 
-//	Starting the game, keyboard & mouse control settings
-function control_game_initialise() {
-	clearInterval(control_menu_handle);
-	Mousetrap.reset();
-
-	/*
-	 * Mousetrap.bind('esc', control_game_pause);
-	 * Mousetrap.bind('p', control_game_pause);
-	 * Mousetrap.bind('enter', control_game_pause);
-	 */
-
-	canvas.onmousemove = control_mouse_position_update;
-	canvas.onmousedown = control_game_mouse_down;
-	canvas.onmouseup   = control_game_mouse_up;
-
-	if (debug) console.log('game initialise');
-
-	model_initialise();
-}
 
 
 
@@ -104,6 +85,28 @@ function control_menu_main() {
 
 
 
+
+/*
+ * starting the game
+ */
+function control_game_initialise() {
+	clearInterval(control_menu_handle);
+	Mousetrap.reset();
+
+	/*
+	 * Mousetrap.bind('esc', control_game_pause);
+	 * Mousetrap.bind('p', control_game_pause);
+	 * Mousetrap.bind('enter', control_game_pause);
+	 */
+
+	canvas.onmousemove = control_mouse_position_update;
+	canvas.onmousedown = control_game_mouse_down;
+	canvas.onmouseup   = control_game_mouse_up;
+
+	if (debug) console.log('game initialise');
+
+	model_initialise();
+}
 
 
 
@@ -166,5 +169,7 @@ function control_menu(title, menu_options, keyboard_controls, mouse_controls) {
 		control_menu_handle = setInterval(function() {
 			view_draw_gui(title, menu_options, keyboard_controls);
 		}, 30);
+
+		if (debug) console.log('loop refreshed');
 	}
 }

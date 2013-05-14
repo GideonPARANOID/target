@@ -17,7 +17,6 @@ function model_initialise() {
 
 	game = true;
 
-	model_levels_initialise();
 	control_game_initialise();
 	view_draw_initialise();
 	view_audio_initialise();
