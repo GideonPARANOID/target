@@ -108,3 +108,103 @@ function control_gui_initialise() {
 		control_gui_menu_main();
 	};
 }
+
+
+
+
+
+
+
+
+
+
+
+
+//	Setting controls & drawing for pages such as high scores, help & achievements
+function control_gui_page(page) {
+	var page_handle = setInterval(function() {
+		if 		(page == 'HIGH SCORES')  view_draw_gui_high_scores(achievements_high_scores_get());
+								  else if (page == 'ACHIEVEMENTS') view_draw_gui_achievements(achievements_get());
+								  else if (page == 'HELP')		 view_draw_gui_help();
+	}, 30);
+
+	Mousetrap.bind('d', function() {
+		if (page == 'HIGH SCORES')  achievements_high_scores_clear();
+				   if (page == 'ACHIEVEMENTS') achievements_clear();
+	});
+
+	Mousetrap.unbind('h');
+	Mousetrap.unbind('left');
+	Mousetrap.unbind('right');
+	Mousetrap.unbind('enter');
+	Mousetrap.bind('esc', function() {
+		clearInterval(page_handle);
+		control_gui_menu_main();
+	});
+
+	canvas.onmousedown = function(e) {
+		Mousetrap.trigger('esc');
+	}
+}
+
+
+
+//	Game over screen drawing, achievement checking & control setting
+function control_gui_game_over(level, score) {
+	var game_over_handle = setInterval(function() {
+		view_draw_gui_game_over(level, score, achievements_high_scores_check(score));
+	}, 30);
+
+	view_audio_music_pause();
+	view_audio_effects_play(2);
+
+	Mousetrap.unbind('left');
+	Mousetrap.unbind('right');
+	Mousetrap.unbind('esc');
+	Mousetrap.unbind('p');
+	Mousetrap.bind('enter', function() {
+		clearInterval(game_over_handle);
+		control_gui_menu_main();
+	});
+
+	canvas.onmousedown = function() {
+		clearInterval(game_over_handle);
+		canvas.onmousedown = null;
+		control_gui_menu_main();
+	};
+}
+
+
+
+
+
+
+
+
+
+//	Game pausing & control setting
+function control_game_pause(e) {
+	if (game) {
+		game = false;
+
+		control_menu('PAUSE', [{
+			key: 'esc',
+			description: 'RETURN TO MENU',
+			functionality: function() {
+				clearInterval(control_menu_handle);
+				control_gui_menu_main();
+			}
+		}, {
+			key: 'p',
+			description: 'UNPAUSE',
+			functionality: function() {
+				game = true;
+				clearInterval(control_menu_handle);
+			}
+		}], null);
+
+	} else {
+		clearInterval(control_menu_handle);
+		game = true;
+	}
+}

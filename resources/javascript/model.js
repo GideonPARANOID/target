@@ -8,7 +8,7 @@ var loop_handle, level_threat_handle;
 
 //	Setting up the model, used for replaying the game too
 function model_initialise() {
-	if (debug) if (debug) console.log('game start');
+	if (debug) console.log('game start');
 
 	lives = 5;
 	score = 0;
@@ -94,7 +94,7 @@ function model_collision_detection() {
 			threats.splice(i, 1);
 			model_life_lost();
 			context.restore();
-			if (debug) if (debug) console.log('collision target');
+			if (debug) console.log('collision target');
 		}
 
 		//	Defense collision detection
@@ -113,7 +113,7 @@ function model_collision_detection() {
 
 				view_audio_effects_play(1);
 
-				if (debug) if (debug) console.log('collision defense');
+				if (debug) console.log('collision defense');
 			}
 		}
 	}
@@ -135,13 +135,13 @@ function model_level_up() {
 	clearInterval(level_threat_handle);
 	level_threat_handle = setInterval(model_threat_add, 3000 - (level * 200));
 
-	if (debug) if (debug) console.log('game level up, next level score ' + level_data[level].score);
+	if (debug) console.log('game level up, next level score ' + level_data[level].score);
 }
 
 
 //	Losing a life, sound effects & acheievement defaulting
 function model_life_lost() {
-	if (debug) if (debug) console.log('game life lost');
+	if (debug) console.log('game life lost');
 
 	view_audio_effects_play(3);
 
@@ -153,7 +153,7 @@ function model_life_lost() {
 
 //	Game over refreshing
 function model_finalise() {
-	if (debug) if (debug) console.log('game over');
+	if (debug) console.log('game over');
 
 	game = false;
 
@@ -174,7 +174,7 @@ function model_finalise() {
 //	Creating levels from JSON using colourlovers' API for styles
 function model_levels_initialise() {
 	var url;
-	
+
 	if (local) 	url = 'resources/data.json';
 	else 		url = 'http://www.colourlovers.com/api/palettes?format=json&numResults=100&jsonCallback=?';
 

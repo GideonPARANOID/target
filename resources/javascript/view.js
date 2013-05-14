@@ -422,27 +422,39 @@ function view_draw_footer(one, two, three, four) {
 
 function view_draw_options(menu_options) {
 	if (menu_options != null) {
+		var options = ['', '', ''];
+
+		//
+		for (var i = 0; i < menu_options.options.length; i++) {
+			options[i] = menu_options.options[i].title;
+		}
+
+		if (options.length == 1) {
+			options[1] = options[0];
+			options[0] = '';
+		}
+
 		context.fillStyle = 'rgba(255, 255, 255, 1.0)';
 
 		if (menu_options.selected == 0) context.fillStyle = 'rgba(' + gui.pulse + ', 0, 0, .75)';
 
 		context.textAlign = 'left';
 		context.font = '25px wipeout';
-		context.fillText((menu_options.options[0] == undefined) ? '' : menu_options.options[0].title, -400, 100);
+		context.fillText(options[0], -400, 100);
 
 		if (menu_options.selected == 0) context.fillStyle = 'rgba(255, 255, 255, 1.0)';
 		if (menu_options.selected == 1) context.fillStyle = 'rgba(' + gui.pulse + ', 0, 0, .75)';
 
 		context.textAlign = 'center';
 		context.font = '25px wipeout';
-		context.fillText((menu_options.options[1] == undefined) ? '' : menu_options.options[1].title, 0, 100);
+		context.fillText(options[1], 0, 100);
 
 		if (menu_options.selected == 1) context.fillStyle = 'rgba(255, 255, 255, 1.0)';
 		if (menu_options.selected == 2) context.fillStyle = 'rgba(' + gui.pulse + ', 0, 0, .75)';
 
 		context.textAlign = 'right';
 		context.font = '25px wipeout';
-		context.fillText((menu_options.options[2] == undefined) ? '' : menu_options.options[2].title, 400, 100);
+		context.fillText(options[2], 400, 100);
 	}
 }
 
@@ -474,7 +486,6 @@ function view_draw_options(menu_options) {
 
 
 function view_draw_gui(title, menu_options, keyboard_controls) {
-
 	var control_hints = ['', '', '', ''];
 
 	// drawing hints in the footer for keyboard controls
