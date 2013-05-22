@@ -115,7 +115,7 @@ function control_game_initialise() {
 var control_menu_handle;
 
 /*
- * draws a menu screen based on the parameters, maximum of three menu options
+ * creates a menu screen based on the parameters, maximum of three menu options
  * resets controls and sets new ones, automatically does arrow keys & enter if menu items exist
  * rather flexible
  *
@@ -132,9 +132,9 @@ function control_menu(title, menu_options, keyboard_controls, mouse_controls) {
 
 	// setting or nullifying mouse controls
 	if (mouse_controls != null) {
-		canvas.onmousedown	= (mouse_controls.onmousedown == undefined)	? null : mouse_controls.mousedown;
-		canvas.onmouseup	= (mouse_controls.onmouseup == undefined)	? null : mouse_controls.onmouseup;
-		canvas.onmousemove	= (mouse_controls.onmousemove == undefined)	? null : mouse_controls.onmousemove;
+		canvas.onmousedown = (mouse_controls.onmousedown == undefined)	? null : mouse_controls.mousedown;
+		canvas.onmouseup	= 	(mouse_controls.onmouseup == undefined)	? null : mouse_controls.onmouseup;
+		canvas.onmousemove = (mouse_controls.onmousemove == undefined)	? null : mouse_controls.onmousemove;
 	}
 	// control setting
 	if (keyboard_controls != null) {

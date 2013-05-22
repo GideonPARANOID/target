@@ -342,8 +342,8 @@ function view_draw_gui_help() {
 
 
 //	Draws information at the bottom of the screen and level up text
-function view_draw_gui_hud(level, lives, score) {
-	view_draw_gui_footer('LEVEL: ' + level, 'LIVES: ' + lives, 'DEFENSES: ' + defenses.length + '/' + (Math.floor(level * 1.5) + 3), 'SCORE: ' + score);
+function view_draw_hud(level, lives, score) {
+	view_draw_footer('LEVEL: ' + level, 'LIVES: ' + lives, 'DEFENSES: ' + defenses.length + '/' + (Math.floor(level * 1.5) + 3), 'SCORE: ' + score);
 
 	if ((level > 1) && (level_shift.timer > 0)){
 		level_shift.timer--;
@@ -359,7 +359,7 @@ function view_draw_gui_hud(level, lives, score) {
 
 //	Draws the level up screen
 function view_draw_gui_pause() {
-	view_draw_gui_header('PAUSE', true);
+	view_draw_gui_title('PAUSE', true);
 
 	(gui.up) ? ((gui.pulse != 255) ? gui.pulse += 15 : gui.up = false) : ((gui.pulse != 000) ? gui.pulse -= 15 : gui.up = true);
 	context.fillStyle = 'rgba(' + gui.pulse + ', 000, 000, .75)';
@@ -376,7 +376,7 @@ function view_draw_gui_pause() {
 
 
 // draws the header of a gui screen - moving background text of title, title_display is whether the title is boldly displayed or not
-function view_draw_header(title, title_display) {
+function view_draw_title(title, title_display) {
 	if (++gui.shift_1 > +canvas.width * .8) gui.shift_1 = -canvas.width;
 	if (--gui.shift_2 < -canvas.width * .8) gui.shift_2 = canvas.width;
 
@@ -484,7 +484,12 @@ function view_draw_options(menu_options) {
 
 
 
-
+/*
+ * draws a menu gui, uses menu object for option name & controls hints
+ * @param 	title				string for the page title
+ * @param 	menu_options		object describing menu options	{selected : index, options : [{title : string, functionality: function}]}
+ * @param 	keyboard_controls	object describing menu controls	[{key : string, description: string, functionality : function}]
+ */
 function view_draw_gui(title, menu_options, keyboard_controls) {
 	var control_hints = ['', '', '', ''];
 
@@ -494,10 +499,10 @@ function view_draw_gui(title, menu_options, keyboard_controls) {
 			keyboard_hints[i] = (keyboard_controls[i] == undefined) ? null : keyboard_controls[i].key + ': ' + keyboard_controls[i].description;
 		}
 	}
-	// pulsing
+	// selected option pulsing
 	(gui.up) ? ((gui.pulse == 255) ? gui.up = false : gui.pulse += 15) : ((gui.pulse == 0) ? gui.up = true : gui.pulse -= 15);
 
-	view_draw_header(title, true);
+	view_draw_title(title, true);
 	view_draw_options(menu_options);
 	view_draw_footer(control_hints[0], control_hints[1], control_hints[2], control_hints[3]);
 }

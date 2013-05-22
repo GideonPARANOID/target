@@ -44,7 +44,7 @@ function model_loop() {
 		view_draw_defenses();
 		view_draw_threats();
 		view_draw_target();
-		view_draw_gui_hud(level, lives, score);
+		view_draw_hud(level, lives, score);
 
 		//	Score iteration (relative to level) & level up comparison
 		if ((score++) == level_data[level].score) model_level_up();

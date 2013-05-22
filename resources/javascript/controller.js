@@ -115,12 +115,12 @@ function control_game_initialise() {
 var control_menu_handle;
 
 /*
- * draws a menu screen based on the parameters, maximum of three menu options
+ * creates a menu screen based on the parameters, maximum of three menu options
  * resets controls and sets new ones, automatically does arrow keys & enter if menu items exist
  * rather flexible
  *
  * @param	title				the title of the menu
- * @param	menu_options		object describing menu options	{selected : index, options : [{title : string, functionality: function}]}
+ * @param	menu_options			object describing menu options	{selected : index, options : [{title : string, functionality: function}]}
  * @param	keyboard_controls	object describing menu controls	[{key : string, description: string, functionality : function}]
  * @param	mouse_controls		object describing menu controls	{mousedown : function, mouseup : function, mousemove : function}
  */
