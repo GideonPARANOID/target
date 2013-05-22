@@ -3,10 +3,8 @@
         <link type='text/css' rel='stylesheet' href='resources/main.css'>
         <link rel='icon' type='image/ico' href='resources/icon.ico'>
 
-        <!--script type='text/javascript' src='//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js'></script-->
-        <!--script type='text/javascript' src='http://cdn.craig.is/js/mousetrap/mousetrap.min.js?a0717'></script-->
-        <script type='text/javascript' src='resources/jquery.min.js'></script>
-        <script type='text/javascript' src='resources/mousetrap.min.js'></script>
+		<script type='text/javascript' src='//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js'></script>
+		<script type='text/javascript' src='http://cdn.craig.is/js/mousetrap/mousetrap.min.js?a0717'></script>
 
 		<script type='text/javascript' src='resources/javascript/model.js'></script>
 		<script type='text/javascript' src='resources/javascript/view.js'></script>
@@ -50,7 +48,6 @@
 
 				//	Game components
 				var debug = true;
-				var local = true;
 
 				var game = false;
 				var level_data = new Array();	//	Level data
@@ -64,8 +61,9 @@
 					context = canvas.getContext('2d');
 					context.translate(canvas.width / 2, canvas.height / 2);	//	Everything is drawn from the center
 
-					//model_levels_initialise();
+					model_levels_initialise();
 
+					
 					control_menu('TARGET', {
 						selected : 0,
 						options  : [{

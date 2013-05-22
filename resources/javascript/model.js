@@ -3,7 +3,7 @@ var score;
 var level;
 var player;
 
-var loop_handle, level_threat_handle;
+var game_handle, level_threat_handle;
 
 
 //	Setting up the model, used for replaying the game too
@@ -17,7 +17,6 @@ function model_initialise() {
 
 	game = true;
 
-	control_game_initialise();
 	view_draw_initialise();
 	view_audio_initialise();
 	//achievements_initialise(level, player);
@@ -27,10 +26,10 @@ function model_initialise() {
 	//	Clearing just in case
 	threats.clear();
 	defenses.clear();
-	clearInterval(loop_handle);
+	clearInterval(game_handle);
 	clearInterval(level_threat_handle);
 
-	loop_handle = setInterval(model_loop, 30);
+	game_handle = setInterval(model_loop, 30);
 	level_threat_handle = setInterval(model_threat_add, 3000);
 }
 
@@ -116,7 +115,7 @@ function model_collision_detection() {
 			}
 		}
 	}
-}
+}game_handle
 
 
 //	Levelling up, manages achievements associated with it, as well as sound effects & drawing
@@ -156,7 +155,7 @@ function model_finalise() {
 
 	game = false;
 
-	clearInterval(loop_handle);
+	clearInterval(game_handle);
 	clearInterval(level_threat_handle);
 
 	//achievements_unlock('HIGH SCORES', score);
@@ -172,44 +171,58 @@ function model_finalise() {
 
 //	Creating levels from JSON using colourlovers' API for styles
 function model_levels_initialise() {
-	var url;
 
-	if (local) 	url = 'resources/data.json';
-	else 		url = 'http://www.colourlovers.com/api/palettes?format=json&numResults=100&jsonCallback=?';
+	$.ajax({
+		url : 'http://www.colourlovers.com/api/palettes?format=json&numResults=100&jsonCallback=?',
+		dataType : 'jsonp',
+		crossDomain : true,
+		beforeSend : function() {
+			if (debug) console.log('api request sent');
+		},
+		success : function(data) {
 
-	$.getJSON(url, function(data) {
-		for (var i = 0; i < 50; i++) { 	// maximum of fifty levels
+			for (var i = 0, j  = 0; j < 50; i++, j++) { 	// maximum of fifty levels
 
-			// skips current if not enough colours in the palette
-			if (data.colors.length < 5) {
-				i--;
-				continue;
-			}
+				// skips current if not enough colours in the palette
+				if (data[i].colors.length >= 5) {
 
-			level_data[i] = {
-				complete : (i * 500),	// points needed to complete the level
-				speed    : (i * .5),	// maximum speed of threats
+					level_data[j] = {
+						complete : (j * 500),	// points needed to complete the level
+						speed    : (j * .5),	// maximum speed of threats
 
-				style : {
-					target : {
-						size   : size,
-						ring_1 : hex_to_array(data[i].colors[0], 1),
-						ring_2 : hex_to_array(data[i].colors[1], 1),
-					},
-					lines : {
-						defenses : hex_to_array(data[i].colors[2], 1),
-						threats	 : hex_to_array(data[i].colors[3], 1),
-					},
-					gui : {
-						background : hex_to_array(data[i].colors[4], 1),
-						text	   : hex_to_array(data[i].colors[2], 1),
-					}
+						style : {
+							target : {
+								size   : 20,
+								ring_1 : hex_to_array(data[i].colors[0], 1),
+								ring_2 : hex_to_array(data[i].colors[1], 1)
+							},
+							lines : {
+								defenses : hex_to_array(data[i].colors[2], 1),
+								threats	 : hex_to_array(data[i].colors[3], 1)
+							},
+							gui : {
+								background : hex_to_array(data[i].colors[4], 1),
+								text	   : hex_to_array(data[i].colors[2], 1)
+							}
+						}
+					};
+				} else {
+					j--;
 				}
-			};
-
+			}
 		}
-
+	}).done(function() {
+		if (debug) console.log('levels loaded');
 	});
+
+}
+
+
+function model_pause() {
+
+
+
+
 }
 
 

@@ -132,9 +132,9 @@ function control_menu(title, menu_options, keyboard_controls, mouse_controls) {
 
 	// setting or nullifying mouse controls
 	if (mouse_controls != null) {
-		canvas.onmousedown	= (mouse_controls.onmousedown == undefined)	? null : mouse_controls.mousedown;
-		canvas.onmouseup	= (mouse_controls.onmouseup == undefined)	? null : mouse_controls.onmouseup;
-		canvas.onmousemove	= (mouse_controls.onmousemove == undefined)	? null : mouse_controls.onmousemove;
+		canvas.onmousedown = (mouse_controls.onmousedown == undefined)	? null : mouse_controls.mousedown;
+		canvas.onmouseup	= 	(mouse_controls.onmouseup == undefined)	? null : mouse_controls.onmouseup;
+		canvas.onmousemove = (mouse_controls.onmousemove == undefined)	? null : mouse_controls.onmousemove;
 	}
 	// control setting
 	if (keyboard_controls != null) {
@@ -169,7 +169,5 @@ function control_menu(title, menu_options, keyboard_controls, mouse_controls) {
 		control_menu_handle = setInterval(function() {
 			view_draw_gui(title, menu_options, keyboard_controls);
 		}, 30);
-
-		if (debug) console.log('loop refreshed');
 	}
 }
