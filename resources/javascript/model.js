@@ -1,6 +1,5 @@
 var lives;
 var score;
-var level;
 var player;
 
 var game_handle, level_threat_handle;
@@ -181,7 +180,8 @@ function model_levels_initialise() {
 		},
 		success : function(data) {
 
-			for (var i = 0, j  = 0; j < 50; i++, j++) { 	// maximum of fifty levels
+			// maximum of fifty levels - i for data, j for level_data
+			for (var i = 0, j  = 0; j < 50; i++, j++) { 
 
 				// skips current if not enough colours in the palette
 				if (data[i].colors.length >= 5) {
