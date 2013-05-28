@@ -100,33 +100,6 @@ function view_draw_defense_current(start_x, start_y, end_x, end_y) {
 
 
 
-//	Works out the difference between the current & last level's colours & returns an object of that value / 30
-function view_level_shift(duration) {
-	//	Constructing an object of the difference between colours, four for four channels - RGBA
-	for (var i = 0; i < 4; i++) {
-		level_shift.target.size[i] 	  = (level_data[level - 1].style.target.size[i]    - level_data[level].style.target.size[i])	/ duration;
-		level_shift.target.ring_1[i]  = (level_data[level - 1].style.target.ring_1[i]  - level_data[level].style.target.ring_1[i])	/ duration;
-		level_shift.target.ring_2[i]  = (level_data[level - 1].style.target.ring_2[i]  - level_data[level].style.target.ring_2[i])	/ duration;
-		level_shift.lines.defenses[i] = (level_data[level - 1].style.lines.defenses[i] - level_data[level].style.lines.defenses[i])	/ duration;
-		level_shift.lines.threats[i]  = (level_data[level - 1].style.lines.threats[i]  - level_data[level].style.lines.threats[i])	/ duration;
-		level_shift.gui.background[i] = (level_data[level - 1].style.gui.background[i] - level_data[level].style.gui.background[i])	/ duration;
-		level_shift.gui.text[i]	   	  = (level_data[level - 1].style.gui.text[i] 	   - level_data[level].style.gui.text[i])	 	/ duration;
-	}
-
-	level_shift.timer = duration;
-
-	if (debug) {
-		if (debug) if (debug) if (debug) console.log('level shift calculation: current/previous/shift: ');
-		if (debug) if (debug) if (debug) console.log(level_data[level].style);
-		if (debug) if (debug) if (debug) console.log(level_data[level - 1].style);
-		if (debug) if (debug) if (debug) console.log(level_shift);
-	}
-}
-
-
-
-
-
 
 
 
@@ -155,13 +128,44 @@ var target = {
 };
 
 
+var level_shift_timer = 0;
+var level_shift = 0;
 
 
 
 
 
-
-
+/*
+ * @param level_current	an object containing the style of the current level
+ * @param level_next		an object containing the style of the next level (for shifting purposes)
+ * @param threats		an array of incoming lines
+ * @param defenses		an array of lines drawn by the user
+ * @param level			the current level
+ * @param lives			the current lives
+ * @param score			the current score
+ */
+function view_draw_game(level_current, level_next, threats, defenses, level, lives, score) {
+	
+	context.lineWidth = 5;
+	
+	if (level != level_shift) {
+		level_shift = 60;
+	} else if (level_shift_timer > 0) {
+		level_shift_timer--;
+	} else if (level_shift_timer == 0) {
+		level_shift = level;
+	}
+	
+	// drawing game & gui elements
+	view_draw_background(view_level_shift(level_current.gui.background, level_next.gui.background));
+	view_draw_threats(view_level_shift(level_current.lines.threats, level_next.lines.threats), threats);
+	view_draw_defenses(view_level_shift(level_current.lines.defenses, level_next.lines.defenses), defenses);
+	view_draw_target(level_current.target.size,
+					 view_level_shift(level_current.target.ring_1, level_next.target.ring_1),
+					 view_level_shift(level_current.target.ring_2, level_next.target.ring_2));
+	
+	view_draw_footer('LEVEL: ' + level, 'LIVES: ' + lives, 'DEFENSES: ' + defenses.length + '/' + (Math.floor(level * 1.5) + 3), 'SCORE: ' + score);
+}
 
 
 /*
@@ -218,10 +222,11 @@ function view_draw_defenses(colour, list) {
 
 
 /*
- * @param	
- * @param	
+ * @param	size			the size of the target
+ * @param	colour_1		the colour of the inner ring
+ * @param	colour_2		the colour of the outer ring
  */
-function view_draw_target(size, ring_1, ring_2) {
+function view_draw_target(size, colour_1, colour_2) {
 
 	if (target.up) {
 		if (target.pulse != 20)	target.pulse++;
@@ -231,64 +236,33 @@ function view_draw_target(size, ring_1, ring_2) {
 		else						target.up = true;
 	}
 	
-	context.strokeStyle = ring_1;
+	context.strokeStyle = colour_1;
 	context.beginPath();
 	context.arc(0, 0, size, target.ring_1 += Math.PI / 30, target.ring_1 + Math.PI);
 	context.stroke();
 	context.closePath();
 	
-	context.strokeStyle = ring_2;
+	context.strokeStyle = colour_2;
 	context.beginPath();
 	
 	// preventing invalid param issues
 	if (size < 20) {
-		context.arc(0, 0, target.size + 10, target.ring_2 -= Math.PI / 30, target.ring_2 + Math.PI);
+		context.arc(0, 0, size + 10, target.ring_2 -= Math.PI / 30, target.ring_2 + Math.PI);
 	} else {
-		context.arc(0, 0, target.size - 10, target.ring_2 -= Math.PI / 30, target.ring_2 + Math.PI);
+		context.arc(0, 0, size - 10, target.ring_2 -= Math.PI / 30, target.ring_2 + Math.PI);
 	}
 	context.stroke();
 	context.closePath();
 }
 
 
-var level_shift_timer = 0;
-var level_shift = 0;
+
 
 /*
- * @param level_current	an object containing the style of the current level
- * @param level_next		an object containing the style of the next level (for shifting purposes)
- * @param threats		an array of incoming lines
- * @param defenses		an array of lines drawn by the user
- * @param level			the current level
- * @param lives			the current lives
- * @param score			the current score
+ * @param	data_component	initial rgba array
+ * @param	shift_component
+ * @return					rgba string of initial component + shifted one
  */
-function view_draw_game(level_current, level_next, threats, defenses, level, lives, score) {
-
-	context.lineWidth = 5;
-
-	if (level != level_shift) {
-		level_shift = 60;
-	} else if (level_shift_timer > 0) {
-		level_shift_timer--;
-	} else if (level_shift_timer == 0) {
-		level_shift = level;
-	}
-	
-	// drawing game & gui elements
-	view_draw_background(view_level_shift(level_current.gui.background, level_next.gui.background));
-	view_draw_threats(view_level_shift(level_current.lines.threats, level_next.lines.threats), threats);
-	view_draw_defenses(view_level_shift(level_current.lines.defenses, level_next.lines.defenses), defenses);
-	view_draw_target(level_current.target.size,
-					 view_level_shift(level_current.target.ring_1, level_next.target.ring_1),
-					 view_level_shift(level_current.target.ring_2, level_next.target.ring_2));
-
-	view_draw_footer('LEVEL: ' + level, 'LIVES: ' + lives, 'DEFENSES: ' + defenses.length + '/' + (Math.floor(level * 1.5) + 3), 'SCORE: ' + score);
-}
-
-
-
-
 function view_level_shift(data_component, shift_component) {
 	return 'rgba(' + Math.ceil(data_component[0] + (shift_component[0] * level_shift_timer))
 	+ ', ' + Math.ceil(data_component[1] + (shift_component[1] * level_shift_timer))
@@ -309,7 +283,10 @@ function view_level_shift(data_component, shift_component) {
 
 
 
-// draws the header of a gui screen - moving background text of title, title_display is whether the title is boldly displayed or not
+/*
+ * @param title			
+ * @param title_display	
+ */
 function view_draw_title(title, title_display) {
 	if (++gui.shift_1 > +canvas.width * .8) gui.shift_1 = -canvas.width;
 	if (--gui.shift_2 < -canvas.width * .8) gui.shift_2 = canvas.width;
