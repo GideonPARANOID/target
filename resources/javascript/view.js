@@ -21,12 +21,7 @@ var level_shift = {
 }
 
 //	Temp variables for target arcs spinning
-var target = {
-	ring_1: 0,
-	ring_2: 0,
-	pulse : 0,
-	up	  : true
-};
+
 
 var audio = {
 	tracks        : [],
@@ -82,75 +77,16 @@ function view_audio_toggle_mute() {
 
 
 
-//	Drawing setup
-function view_draw_initialise() {
-	context.strokeStyle = view_get_shifted_rgba(level_data[level].style.gui.text, level_shift.gui.text);
-	context.lineWidth = 5;
-}
 
 
-//	Canvas clearing & setting of background colour appropriate to the level
-function view_draw_canvas() {
-	if (level_data.length == 0) canvas.style.background = 'rgba(0, 0, 0, 1.0)';
-	else						canvas.style.background = view_get_shifted_rgba(level_data[level].style.gui.background, level_shift.gui.background);
-
-	context.beginPath();
-	context.save();
-	context.setTransform(1, 0, 0, 1, 0, 0);
-	context.clearRect(0, 0, canvas.width, canvas.height);
-	context.restore();
-	context.closePath();
-}
 
 
-//	Drawing the centre target player thing
-function view_draw_target() {
-	if (audio.tracks[audio.tracks_current].currentTime == audio.tracks[audio.tracks_current].duration) view_audio_music_play(audio.tracks_current);
-
-	//	Pulsing
-	if (target.up) {
-		if (target.pulse != 20)	target.pulse++;
-		else 					target.up = false;
-	} else {
-		if (target.pulse != 0)	target.pulse--;
-		else					target.up = true;
-	}
-
-	var size = level_data[level].style.target.size + Math.ceil(level_shift.target.size * level_shift.timer) + target.pulse;
-
-	context.strokeStyle = view_get_shifted_rgba(level_data[level].style.target.ring_1, level_shift.target.ring_1);
-	context.beginPath();
-	context.arc(0, 0, size, target.ring_1 += Math.PI / 30, target.ring_1 + Math.PI);
-	context.stroke();
-	context.closePath();
-
-	context.strokeStyle = view_get_shifted_rgba(level_data[level].style.target.ring_2, level_shift.target.ring_2);
-	context.beginPath();
-
-	//	Too small rings can cause invalid parameter issues
-	if (size < 20)	context.arc(0, 0, size + 10, target.ring_2 -= Math.PI / 30, target.ring_2 + Math.PI);
-	else			context.arc(0, 0, size - 10, target.ring_2 -= Math.PI / 30, target.ring_2 + Math.PI);
-
-	context.stroke();
-	context.closePath();
-}
 
 
-//	Incoming lines
-function view_draw_threats(i) {
-	context.strokeStyle = view_get_shifted_rgba(level_data[level].style.lines.threats, level_shift.lines.threats);
 
-	//	Maximum distance from the center, for line length, pythagoras
-	var trig = (((canvas.width / 2) ^ 2) + ((canvas.height / 2) ^ 2)) ^ .5;
 
-	for (var i = 0; i < threats.length; i++) {
-		context.beginPath();
-		context.moveTo(Math.cos(threats[i].angle) * trig, 				 Math.sin(threats[i].angle) * trig);
-		context.lineTo(Math.cos(threats[i].angle) * threats[i].distance, Math.sin(threats[i].angle) * threats[i].distance);
-		context.stroke();
-		context.closePath();
-	}
-}
+
+
 
 
 //	Drawing the current line if mouse is down
@@ -161,18 +97,7 @@ function view_draw_defense_current(start_x, start_y, end_x, end_y) {
 }
 
 
-//	Lines the player draws
-function view_draw_defenses() {
-	context.strokeStyle = view_get_shifted_rgba(level_data[level].style.lines.defenses, level_shift.lines.defenses);
 
-	for (var i = 0; i < defenses.length; i++) {
-		context.beginPath();
-		context.moveTo(defenses[i].start.x, defenses[i].start.y);
-		context.lineTo(defenses[i].end.x, 	defenses[i].end.y);
-		context.stroke();
-		context.closePath();
-	}
-}
 
 
 //	Works out the difference between the current & last level's colours & returns an object of that value / 30
@@ -199,14 +124,6 @@ function view_level_shift(duration) {
 }
 
 
-//	Converts the level data colour value arrays into an RGBA string for context colour setting
-function view_get_shifted_rgba(data_component, shift_component) {
-	return 'rgba(' + Math.ceil(data_component[0] + (shift_component[0] * level_shift.timer))
-	 	 + ', ' + Math.ceil(data_component[1] + (shift_component[1] * level_shift.timer))
-		 + ', ' + Math.ceil(data_component[2] + (shift_component[2] * level_shift.timer))
-		 + ', ' + Math.ceil(data_component[3] + (shift_component[3] * level_shift.timer))
-		 + ')';
-}
 
 
 
@@ -220,8 +137,7 @@ function view_get_shifted_rgba(data_component, shift_component) {
 
 
 
-
-//	GUI pulsing & title shifting
+// gui pulsing and shifting
 var gui = {
 	pulse  : 255,
 	up	   : true,
@@ -230,144 +146,162 @@ var gui = {
 };
 
 
-function view_draw_gui_start() {
-	view_draw_gui_header('TARGET', true);
+// arc spinning
+var target = {
+	ring_1: 0,
+	ring_2: 0,
+	pulse : 0,
+	up	  : true
+};
 
-	//	Selected item pulsing
-	(gui.up) ? ((gui.pulse != 255) ? gui.pulse += 15 : gui.up = false) : ((gui.pulse != 000) ? gui.pulse -= 15 : gui.up = true);
 
-	context.fillStyle = 'rgba(' + gui.pulse +', 000, 000, 1.0)';
-	context.fillText('CLICK TO START', 0, 100);
+
+
+
+
+
+
+
+
+
+/*
+ * @param background		the background colour
+ */
+function view_draw_background(background) {
+	canvas.style.background = (background != null) ? background : 'rgba(0, 0, 0, 0)';
+	
+	context.beginPath();
+	context.save();
+	context.setTransform(1, 0, 0, 1, 0, 0);
+	context.clearRect(0, 0, canvas.width, canvas.height);
+	context.restore();
+	context.closePath();
 }
 
 
-//	The menu, sets the mouse listening appropriately
-function view_draw_gui_menu(selection) {
-	if (selection == null) selection = 1;
+/*
+ * @param colour		rgba colour of the threats
+ * @param list		an array of threats
+ */
+function view_draw_threats(colour, list) {
+	// maximum distance from the center, for line length, pythagoras
+	var trig = (((canvas.width / 2) ^ 2) + ((canvas.height / 2) ^ 2)) ^ .5;
 
-	view_draw_gui_header('TARGET', true);
-
-	//	Selected item pulsing set by selection if statements
-	(gui.up) ? ((gui.pulse != 255) ? gui.pulse += 15 : gui.up = false) : ((gui.pulse != 000) ? gui.pulse -= 15 : gui.up = true);
-
-	if (selection == 0)	context.fillStyle = 'rgba(' + gui.pulse + ', 000, 000, .75)';
-
-	context.textAlign = 'left';
-	context.font = '25px wipeout';
-	context.fillText('ACHIEVEMENTS', -400, 100);
-
-	if (selection == 0) context.fillStyle = 'rgba(255, 255, 255, 1.0)';
-	if (selection == 1) context.fillStyle = 'rgba(' + gui.pulse + ', 000, 000, .75)';
-
-	context.textAlign = 'center';
-	context.font = '25px wipeout';
-	context.fillText('START', 0, 100);
-
-	if (selection == 1) context.fillStyle = 'rgba(255, 255, 255, 1.0)';
-	if (selection == 2) context.fillStyle = 'rgba(' + gui.pulse + ', 000, 000, .75)';
-
-	context.textAlign = 'right';
-	context.font = '25px wipeout';
-	context.fillText('HIGH SCORES', 400, 100);
-
-	view_draw_gui_footer('H: HELP', 'ESC: MENU','M: MUTE MUSIC', 'ENTER: SELECT');
+	context.strokeStyle = colour;
+	
+	for (var i = 0; i < threats.length; i++) {
+		context.beginPath();
+		context.moveTo(Math.cos(list[i].angle) * trig, Math.sin(list[i].angle) * trig);
+		context.lineTo(Math.cos(list[i].angle) * list[i].distance, Math.sin(list[i].angle) * list[i].distance);
+		context.stroke();
+		context.closePath();
+	}
 }
 
 
-//	Draws the screen displaying achievements
-function view_draw_gui_achievements(achievements) {
-	view_draw_gui_header('ACHIEVEMENTS', false);
-
-	context.textBaseline = 'top';
-
-	context.textAlign = 'left';
-	for (var i = 0, j = (-canvas.height * .5) + (canvas.height * .1); i < achievements.length; i++, j += 30) context.fillText(achievements[i].description, -canvas.width * .35, j);
-
-	context.textAlign = 'right';
-	for (var i = 0, j = (-canvas.height * .5) + (canvas.height * .1); i < achievements.length; i++, j += 30) context.fillText(achievements[i].data, canvas.width * .35, j);
-
-	view_draw_gui_footer('', 'ESC: MENU', '', 'D: RESET ACHIEVEMENTS');
+/*
+ * @param colour		rgba colour of the defenses
+ * @param list		an array of defenses
+ */
+function view_draw_defenses(colour, list) {
+	context.strokeStyle = colour;
+	
+	for (var i = 0; i < list.length; i++) {
+		context.beginPath();
+		context.moveTo(list[i].start.x, list[i].start.y);
+		context.lineTo(list[i].end.x, list[i].end.y);
+		context.stroke();
+		context.closePath();
+	}
 }
 
 
-//	Draws the screen displaying high scores
-function view_draw_gui_high_scores(high_scores) {
-	view_draw_gui_header('HIGH SCORES', false);
 
-	context.textBaseline = 'top';
+/*
+ * @param	
+ * @param	
+ */
+function view_draw_target(size, ring_1, ring_2) {
 
-	if (high_scores.scores != null) {
-		for (var i = 0, j = (-canvas.height * .5) + (canvas.height * .1); i < high_scores.scores.length; i++, j += 30) {
-			context.textAlign = 'left';
-			context.fillText(high_scores.scores[i].score, -canvas.width * .35, j);
-			context.textAlign = 'right';
-			context.fillText(high_scores.scores[i].date, canvas.width * .35, j);
-		}
+	if (target.up) {
+		if (target.pulse != 20)	target.pulse++;
+		else 					target.up = false;
 	} else {
-		context.fillText('NO HIGH SCORES', 0, 0);
+		if (target.pulse != 0)	target.pulse--;
+		else						target.up = true;
 	}
-
-	view_draw_gui_footer('', 'ESC: MENU', '', 'D: RESET HIGH SCORES');
+	
+	context.strokeStyle = ring_1;
+	context.beginPath();
+	context.arc(0, 0, size, target.ring_1 += Math.PI / 30, target.ring_1 + Math.PI);
+	context.stroke();
+	context.closePath();
+	
+	context.strokeStyle = ring_2;
+	context.beginPath();
+	
+	// preventing invalid param issues
+	if (size < 20) {
+		context.arc(0, 0, target.size + 10, target.ring_2 -= Math.PI / 30, target.ring_2 + Math.PI);
+	} else {
+		context.arc(0, 0, target.size - 10, target.ring_2 -= Math.PI / 30, target.ring_2 + Math.PI);
+	}
+	context.stroke();
+	context.closePath();
 }
 
 
-//	Draws the game over screen
-function view_draw_gui_game_over(level, score, high_score) {
-	view_draw_gui_header('GAME OVER', true);
+var level_shift_timer = 0;
+var level_shift = 0;
 
-	(gui.up) ? ((gui.pulse != 255) ? gui.pulse += 15 : gui.up = false) : ((gui.pulse != 000) ? gui.pulse -= 15 : gui.up = true);
+/*
+ * @param level_current	an object containing the style of the current level
+ * @param level_next		an object containing the style of the next level (for shifting purposes)
+ * @param threats		an array of incoming lines
+ * @param defenses		an array of lines drawn by the user
+ * @param level			the current level
+ * @param lives			the current lives
+ * @param score			the current score
+ */
+function view_draw_game(level_current, level_next, threats, defenses, level, lives, score) {
 
-	if (high_score) context.fillText('HIGH SCORE! ' + score, 0, 50);
-	else			context.fillText(score, 0, 50);
+	context.lineWidth = 5;
 
-	context.fillStyle = 'rgba(' + gui.pulse + ', 000, 000, .75)';
-	context.fillText('RETURN TO MENU', 0, 100);
-}
+	if (level != level_shift) {
+		level_shift = 60;
+	} else if (level_shift_timer > 0) {
+		level_shift_timer--;
+	} else if (level_shift_timer == 0) {
+		level_shift = level;
+	}
+	
+	// drawing game & gui elements
+	view_draw_background(view_level_shift(level_current.gui.background, level_next.gui.background));
+	view_draw_threats(view_level_shift(level_current.lines.threats, level_next.lines.threats), threats);
+	view_draw_defenses(view_level_shift(level_current.lines.defenses, level_next.lines.defenses), defenses);
+	view_draw_target(level_current.target.size,
+					 view_level_shift(level_current.target.ring_1, level_next.target.ring_1),
+					 view_level_shift(level_current.target.ring_2, level_next.target.ring_2));
 
-
-//	Draws the help screen
-function view_draw_gui_help() {
-	view_draw_gui_header('HELP', true);
-
-	context.textAlign = 'center';
-
-	context.fillText('THE OBJECTIVE OF THE GAME IS TO PREVENT', 0, 50);
-	context.fillText('LINES FROM REACHING THE CENTRE "TARGET"', 0, 80);
-	context.fillText(' BY CLICKING  AND DRAGGING WITH THE MOUSE', 0, 110);
-	context.fillText('TO DRAW YOUR OWN INES TO BLOCK THEM ', 0, 140);
-
-	view_draw_gui_footer('', 'ESC: MENU', '', '');
-}
-
-
-
-//	Draws information at the bottom of the screen and level up text
-function view_draw_hud(level, lives, score) {
 	view_draw_footer('LEVEL: ' + level, 'LIVES: ' + lives, 'DEFENSES: ' + defenses.length + '/' + (Math.floor(level * 1.5) + 3), 'SCORE: ' + score);
-
-	if ((level > 1) && (level_shift.timer > 0)){
-		level_shift.timer--;
-
-		context.fillStyle = view_get_shifted_rgba(level_data[level].style.gui.text, level_shift.gui.text);
-		context.textAlign = 'center';
-		context.textBaseline = 'bottom';
-
-		context.fillText('LEVEL UP!', 0, (canvas.height * .5) - 40);
-	}
 }
 
 
-//	Draws the level up screen
-function view_draw_gui_pause() {
-	view_draw_gui_title('PAUSE', true);
 
-	(gui.up) ? ((gui.pulse != 255) ? gui.pulse += 15 : gui.up = false) : ((gui.pulse != 000) ? gui.pulse -= 15 : gui.up = true);
-	context.fillStyle = 'rgba(' + gui.pulse + ', 000, 000, .75)';
 
-	context.fillText('CONTINUE', 0, 100);
-
-	view_draw_gui_footer('', 'ESC: MENU', '', 'ENTER: SELECT');
+function view_level_shift(data_component, shift_component) {
+	return 'rgba(' + Math.ceil(data_component[0] + (shift_component[0] * level_shift_timer))
+	+ ', ' + Math.ceil(data_component[1] + (shift_component[1] * level_shift_timer))
+	+ ', ' + Math.ceil(data_component[2] + (shift_component[2] * level_shift_timer))
+	+ ', ' + Math.ceil(data_component[3] + (shift_component[3] * level_shift_timer))
+	+ ')';
 }
+
+
+
+
+
+
 
 
 
@@ -380,7 +314,7 @@ function view_draw_title(title, title_display) {
 	if (++gui.shift_1 > +canvas.width * .8) gui.shift_1 = -canvas.width;
 	if (--gui.shift_2 < -canvas.width * .8) gui.shift_2 = canvas.width;
 
-	view_draw_canvas();
+	view_draw_background();
 
 	context.fillStyle = 'rgba(000, 000, 000, 1.0)';
 	context.fillRect(-canvas.width * .5, -canvas.height * .4, canvas.width, canvas.height * .8);

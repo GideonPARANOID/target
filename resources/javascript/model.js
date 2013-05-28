@@ -5,6 +5,11 @@ var player;
 var game_handle, level_threat_handle;
 
 
+var level_data = new Array();	//	Level data
+var defenses = new Array();		//	Lines the player draws
+var threats = new Array();		//	Incoming lines
+
+
 //	Setting up the model, used for replaying the game too
 function model_initialise() {
 	if (debug) console.log('game start');
@@ -16,11 +21,11 @@ function model_initialise() {
 
 	game = true;
 
-	view_draw_initialise();
-	view_audio_initialise();
+	//view_draw_initialise();
+	//view_audio_initialise();
 	//achievements_initialise(level, player);
 
-	view_audio_music_play(Math.ceil(Math.random() * 3));
+	//view_audio_music_play(Math.ceil(Math.random() * 3));
 
 	//	Clearing just in case
 	threats.clear();
@@ -37,17 +42,13 @@ function model_initialise() {
 //	The main game loop
 function model_loop() {
 	if (game) {
-		//	Clearing & redrawing
-		view_draw_canvas();
+		view_draw_game(level_data[level].style, level_data[level + 1].style, threats, defenses, level, lives, score);
+		
 		model_collision_detection();
 		control_game_defense_current();
-		view_draw_defenses();
-		view_draw_threats();
-		view_draw_target();
-		view_draw_hud(level, lives, score);
 
 		//	Score iteration (relative to level) & level up comparison
-		if ((score++) == level_data[level].score) model_level_up();
+		if ((score++) == ((level) * 500)) model_level_up();
 	}
 }
 
@@ -212,6 +213,8 @@ function model_levels_initialise() {
 			}
 		}
 	}).done(function() {
+		level_data.shuffle();
+		
 		if (debug) console.log('levels loaded');
 	});
 
