@@ -1,3 +1,8 @@
+/*
+ * @author	gideon mw jones (@gideonparanoid)
+ * @version	who knows
+ */
+
 var lives;
 var score;
 var player;
@@ -5,7 +10,7 @@ var player;
 var game_handle, level_threat_handle;
 
 
-var level_data = new Array();	//	Level data
+var level_data = new Array();		//	Level data
 var defenses = new Array();		//	Lines the player draws
 var threats = new Array();		//	Incoming lines
 
@@ -21,13 +26,7 @@ function model_initialise() {
 
 	game = true;
 
-	//view_draw_initialise();
-	//view_audio_initialise();
-	//achievements_initialise(level, player);
-
-	//view_audio_music_play(Math.ceil(Math.random() * 3));
-
-	//	Clearing just in case
+	// clearing
 	threats.clear();
 	defenses.clear();
 	clearInterval(game_handle);
@@ -39,7 +38,9 @@ function model_initialise() {
 
 
 
-//	The main game loop
+/*
+ * main game loop
+ */
 function model_loop() {
 	if (game) {
 		view_draw_game(level_data[level].style, level_data[level + 1].style, threats, defenses, level, lives, score);
@@ -53,7 +54,9 @@ function model_loop() {
 }
 
 
-//	Adding a new incoming line
+/*
+ * adds an incoming line
+ */
 function model_threat_add() {
 	if (game) {
 		threats.push({
@@ -65,16 +68,18 @@ function model_threat_add() {
 }
 
 
-//	Adding a defending line (drawn by the user)
-function model_defense_add() {
+/*
+ * adds
+ */
+function model_defense_add(x1, y1, x2, y2) {
 	defenses.push({
 		start : {
-			x : mouse.start.x,
-			y : mouse.start.y
+			x : x1,
+			y : y1
 		},
 		end : {
-			x : mouse.end.x,
-			y : mouse.end.y
+			x : x2,
+			y : y2
 		}
 	});
 
@@ -115,7 +120,7 @@ function model_collision_detection() {
 			}
 		}
 	}
-}game_handle
+}
 
 
 //	Levelling up, manages achievements associated with it, as well as sound effects & drawing
@@ -123,13 +128,12 @@ function model_level_up() {
 	//	As the API requests' content changes rarely, shuffles to maintain randomness of level colours
 	level++;
 
-	view_audio_effects_play(0);
 
 	view_level_shift(30);
 
 	//achievements_check(level, lives, score);
 
-	//	Increasing the rate of threat adding
+	// increasing the rate of threat adding
 	clearInterval(level_threat_handle);
 	level_threat_handle = setInterval(model_threat_add, 3000 - (level * 200));
 
@@ -194,16 +198,16 @@ function model_levels_initialise() {
 						style : {
 							target : {
 								size   : 20,
-								ring_1 : hex_to_array(data[i].colors[0], 1),
-								ring_2 : hex_to_array(data[i].colors[1], 1)
+								ring_1 : hex_to_hsla_array(data[i].colors[0]),
+								ring_2 : hex_to_hsla_array(data[i].colors[1])
 							},
 							lines : {
-								defenses : hex_to_array(data[i].colors[2], 1),
-								threats	 : hex_to_array(data[i].colors[3], 1)
+								defenses : hex_to_hsla_array(data[i].colors[2]),
+								threats	 : hex_to_hsla_array(data[i].colors[3])
 							},
 							gui : {
-								background : hex_to_array(data[i].colors[4], 1),
-								text	   : hex_to_array(data[i].colors[2], 1)
+								background : hex_to_hsla_array(data[i].colors[4]),
+								text	   : hex_to_hsla_array(data[i].colors[2])
 							}
 						}
 					};
@@ -214,7 +218,10 @@ function model_levels_initialise() {
 		}
 	}).done(function() {
 		level_data.shuffle();
-		
+
+		// moderation
+		//for (var i = 0; i < level_data.length; i++) 
+
 		if (debug) console.log('levels loaded');
 	});
 

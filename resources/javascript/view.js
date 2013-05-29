@@ -23,53 +23,6 @@ var level_shift = {
 //	Temp variables for target arcs spinning
 
 
-var audio = {
-	tracks        : [],
-	tracks_current: 0,
-	effects 	  : [],		//	Level up, threat destroy, game over, life lost
-	mute		  : false
-};
-
-//	Constructing the tracks & effects arrays in the audio object from the html elements
-function view_audio_initialise() {
-	for (var i = 0; i < 4; i++) audio.tracks.push(document.getElementsByTagName('audio')[i]);
-	for (var i = 4; i < 8; i++) audio.effects.push(document.getElementsByTagName('audio')[i]);
-}
-
-
-//	Plays an index from tracks array in the audio object, if no index specified, falls back to the last played
-function view_audio_music_play(index) {
-	if (index != null) audio.tracks_current = index;
-
-	if (debug) if (debug) if (debug) if (debug) console.log('audio track ' + audio.tracks_current);
-
-	audio.tracks[audio.tracks_current].play();
-}
-
-
-//	Pauses the current track
-function view_audio_music_pause() {
-	audio.tracks[audio.tracks_current].pause();
-}
-
-
-//	Plays a sound effect
-function view_audio_effects_play(index) {
-	audio.effects[index].play();
-}
-
-
-function view_audio_toggle_mute() {
-	if (debug) if (debug) if (debug) if (debug) console.log('audio mute toggled');
-
-	if (audio.mute) {
-		audio.tracks[audio.tracks_current].volume = 1;
-		audio.mute = false;
-	} else {
-		audio.tracks[audio.tracks_current].volume = 0;
-		audio.mute = true;
-	}
-}
 
 
 
@@ -83,17 +36,16 @@ function view_audio_toggle_mute() {
 
 
 
-
-
-
-
-
-
-//	Drawing the current line if mouse is down
-function view_draw_defense_current(start_x, start_y, end_x, end_y) {
-	context.moveTo(start_x, start_y);
-	context.lineTo(end_x, end_y);
+/*
+ * draws a line between the sets of coordinates passed in
+ * @param x1, y1, x2, y2	the start & end coordinates of an end of a lines
+ */
+function view_draw_defense_current(x1, y1, x2, y2) {
+	context.beginPath();
+	context.moveTo(x1, y1);
+	context.lineTo(x2, y2);
 	context.stroke();
+	context.closePath();
 }
 
 
@@ -148,13 +100,10 @@ function view_draw_game(level_current, level_next, threats, defenses, level, liv
 	
 	context.lineWidth = 5;
 	
-	if (level != level_shift) {
-		level_shift = 60;
-	} else if (level_shift_timer > 0) {
-		level_shift_timer--;
-	} else if (level_shift_timer == 0) {
-		level_shift = level;
-	}
+	if (level != level_shift) 		level_shift = 60;
+	else if (level_shift_timer == 0)	level_shift = level;
+	else if (level_shift_timer > 0)	level_shift_timer--;
+	
 	
 	// drawing game & gui elements
 	view_draw_background(view_level_shift(level_current.gui.background, level_next.gui.background));
@@ -164,15 +113,18 @@ function view_draw_game(level_current, level_next, threats, defenses, level, liv
 					 view_level_shift(level_current.target.ring_1, level_next.target.ring_1),
 					 view_level_shift(level_current.target.ring_2, level_next.target.ring_2));
 	
-	view_draw_footer('LEVEL: ' + level, 'LIVES: ' + lives, 'DEFENSES: ' + defenses.length + '/' + (Math.floor(level * 1.5) + 3), 'SCORE: ' + score);
+	view_draw_footer('LEVEL: ' + level,
+					'LIVES: ' + lives,
+					'DEFENSES: ' + defenses.length + '/' + (Math.floor(level * 1.5) + 3),
+					'SCORE: ' + score);
 }
 
 
 /*
- * @param background		the background colour
+ * @param background		hsla background colour
  */
 function view_draw_background(background) {
-	canvas.style.background = (background != null) ? background : 'rgba(0, 0, 0, 0)';
+	canvas.style.background = (background != null) ? background : 'hsla(0, 0%, 0%, 1)';
 	
 	context.beginPath();
 	context.save();
@@ -184,7 +136,7 @@ function view_draw_background(background) {
 
 
 /*
- * @param colour		rgba colour of the threats
+ * @param colour		hsla colour of the threats
  * @param list		an array of threats
  */
 function view_draw_threats(colour, list) {
@@ -204,7 +156,7 @@ function view_draw_threats(colour, list) {
 
 
 /*
- * @param colour		rgba colour of the defenses
+ * @param colour		hsla colour of the defenses
  * @param list		an array of defenses
  */
 function view_draw_defenses(colour, list) {
@@ -259,15 +211,15 @@ function view_draw_target(size, colour_1, colour_2) {
 
 
 /*
- * @param	data_component	initial rgba array
- * @param	shift_component
- * @return					rgba string of initial component + shifted one
+ * @param	data_component	initial hsla array
+ * @param	shift_component	a fraction of the difference between current & next level
+ * @return					hsla string of initial component + shifted one
  */
 function view_level_shift(data_component, shift_component) {
-	return 'rgba(' + Math.ceil(data_component[0] + (shift_component[0] * level_shift_timer))
+	return 'hsla(' + Math.ceil(data_component[0] + (shift_component[0] * level_shift_timer))
 	+ ', ' + Math.ceil(data_component[1] + (shift_component[1] * level_shift_timer))
-	+ ', ' + Math.ceil(data_component[2] + (shift_component[2] * level_shift_timer))
-	+ ', ' + Math.ceil(data_component[3] + (shift_component[3] * level_shift_timer))
+	+ '%, ' + Math.ceil(data_component[2] + (shift_component[2] * level_shift_timer))
+	+ '%, ' + Math.ceil(data_component[3] + (shift_component[3] * level_shift_timer))
 	+ ')';
 }
 
@@ -284,50 +236,52 @@ function view_level_shift(data_component, shift_component) {
 
 
 /*
- * @param title			
- * @param title_display	
+ * @param title	string for the large title at the top of the screen
  */
-function view_draw_title(title, title_display) {
+function view_draw_title(title) {
 	if (++gui.shift_1 > +canvas.width * .8) gui.shift_1 = -canvas.width;
 	if (--gui.shift_2 < -canvas.width * .8) gui.shift_2 = canvas.width;
 
 	view_draw_background();
 
-	context.fillStyle = 'rgba(000, 000, 000, 1.0)';
+	context.fillStyle = 'hsla(0, 0%, 0%, 1)';
 	context.fillRect(-canvas.width * .5, -canvas.height * .4, canvas.width, canvas.height * .8);
 
-	context.fillStyle = 'rgba(255, 255, 255, .75)';
+	context.fillStyle = 'hsla(0, 0%, 100%, 1)';
 	context.textAlign = 'center';
 	context.textBaseline = 'center';
 	context.font = '150px wipeout';
-	if (title_display) context.fillText(title, 0, 0);
+	context.fillText(title, 0, 0);
 
-	context.fillStyle = 'rgba(255, 255, 255, 0.25)';
+	context.fillStyle = 'hsla(0, 0%, 100%, .25)';
 	context.fillText(title, gui.shift_1, 50);
 	context.fillText(title, gui.shift_2, -50);
-
-	context.fillStyle = 'rgba(255, 255, 255, .75)';
-	context.font = '25px wipeout';
 }
 
 
 // draws the footer of the screen displaying the strings passed
+/*
+ * @param one	string for the furthest left item
+ * @param two	string for the closest left item
+ * @param three	string for the furthest right item
+ * @param four	string for the closest right item
+ */
 function view_draw_footer(one, two, three, four) {
 	context.textAlign = 'center';
 	context.textBaseline = 'bottom';
 	context.font = '25px wipeout';
 
-	context.fillStyle = 'rgba(000, 000, 000, 1.0)';
+	context.fillStyle = 'hsla(0, 0%, 0%, 1)';
 	context.fillRect(-canvas.width * .5, canvas.height * .45, canvas.width, canvas.height * .1);
-	context.fillStyle = 'rgba(255, 255, 255, 0.75)';
+	context.fillStyle = 'hsla(0, 0%, 100%, 1)';
 
 	context.textAlign = 'right';
-	context.fillText(one, -canvas.width * .25, canvas.height * .5);
+	context.fillText(one, -canvas.width / 4, canvas.height * .5);
 	context.fillText(two, -canvas.width / 16, canvas.height * .5);
 
 	context.textAlign = 'left';
-	context.fillText(three, canvas.width * .25, canvas.height * .5);
-	context.fillText(four, canvas.width / 16, canvas.height * .5);
+	context.fillText(three, canvas.width / 16, canvas.height * .5);
+	context.fillText(four, canvas.width / 4, canvas.height * .5);
 }
 
 
@@ -398,7 +352,7 @@ function view_draw_options(menu_options) {
 /*
  * draws a menu gui, uses menu object for option name & controls hints
  * @param 	title				string for the page title
- * @param 	menu_options		object describing menu options	{selected : index, options : [{title : string, functionality: function}]}
+ * @param 	menu_options			object describing menu options	{selected : index, options : [{title : string, functionality: function}]}
  * @param 	keyboard_controls	object describing menu controls	[{key : string, description: string, functionality : function}]
  */
 function view_draw_gui(title, menu_options, keyboard_controls) {
@@ -410,10 +364,11 @@ function view_draw_gui(title, menu_options, keyboard_controls) {
 			keyboard_hints[i] = (keyboard_controls[i] == undefined) ? null : keyboard_controls[i].key + ': ' + keyboard_controls[i].description;
 		}
 	}
+	
 	// selected option pulsing
 	(gui.up) ? ((gui.pulse == 255) ? gui.up = false : gui.pulse += 15) : ((gui.pulse == 0) ? gui.up = true : gui.pulse -= 15);
 
-	view_draw_title(title, true);
+	view_draw_title(title);
 	view_draw_options(menu_options);
 	view_draw_footer(control_hints[0], control_hints[1], control_hints[2], control_hints[3]);
 }

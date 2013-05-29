@@ -1,3 +1,8 @@
+/*
+ * @author	gideon mw jones (@gideonparanoid)
+ * @version	who knows
+ */
+
 var mouse = {
 	start: {
 		x: 0,
@@ -11,10 +16,12 @@ var mouse = {
 };
 
 
-// sets mouse object end coordinates, looks more complex than it actually is because the centre of the canvas is the origin
+/*
+ * sets mouse object end coordinates
+ */
 function control_mouse_position_update(e) {
-	mouse.end.x = (e.pageX - canvas.offsetLeft < 0)	? canvas.width / 2 - (e.pageX - canvas.offsetLeft) : (e.pageX - canvas.offsetLeft) - canvas.width / 2;
-	mouse.end.y = (e.pageY - canvas.offsetTop < 0)	? canvas.height / 2 - (e.pageY - canvas.offsetTop) : (e.pageY - canvas.offsetTop) - canvas.height / 2;
+	mouse.end.x = (e.pageX - canvas.offsetLeft < 0) ? canvas.width / 2 - (e.pageX - canvas.offsetLeft) : (e.pageX - canvas.offsetLeft) - canvas.width / 2;
+	mouse.end.y = (e.pageY - canvas.offsetTop < 0)	 ? canvas.height / 2 - (e.pageY - canvas.offsetTop) : (e.pageY - canvas.offsetTop) - canvas.height / 2;
 }
 
 
@@ -38,7 +45,7 @@ function control_game_defense_current() {
 //	Adds another set of coordinates to the array of lines
 function control_game_mouse_up(e) {
 	if (e.which == 1) {
-		model_defense_add();
+		model_defense_add(mouse.start.x, mouse.start.y, mouse.end.x, mouse.end.y);
 		mouse.down = false;
 	}
 }

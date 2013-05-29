@@ -1,3 +1,9 @@
+/*
+ * @author	gideon mw jones (@gideonparanoid)
+ * @version	who knows
+ */
+
+
 //	Achievements saved in an associative array - key/value pairs
 //	Key 	: string - name of achievement 
 //	Value	: object

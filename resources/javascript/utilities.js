@@ -1,27 +1,35 @@
-// converting hexidecimal values into RGB ones
-// reference: http://www.javascripter.net/faq/hextorgb.htm
-function hex_to_red(hex) {
-	return parseInt((cut_hex(hex)).substring(0, 2), 16);
+/*
+ * @author	gideon mw jones (@gideonparanoid)
+ * @version	who knows
+ */
+
+
+/*
+ * @param hex	hexidecimal colour value to be converted
+ * @return		array of numbers describing a hsla colour [hue, saturation, lightness, transparency]
+ */
+function hex_to_hsla_array(hex) {
+	var temp = color2color(hex, 'hsla');
+
+	temp = temp.replace('hsl(','');
+	temp = temp.replace(')','');
+	
+	var array = temp.split(',');
+	
+	return [parseInt(array[0]), parseInt(array[1]), parseInt(array[2]), 1];
 }
 
-function hex_to_green(hex) {
-	return parseInt((cut_hex(hex)).substring(2, 4), 16);
-}
-
-function hex_to_blue(hex) {
-	return parseInt((cut_hex(hex)).substring(4, 6), 16);
-}
-
-function cut_hex(hex) {
-	return (hex.charAt(0) == '#') ? hex.substring(1, 7) : hex;
-}
-
-function hex_to_array(hex, transparency) {
-	return [hex_to_red(hex), hex_to_green(hex), hex_to_blue(hex), transparency];
-}
 
 
-// returns a string of the time & date
+
+
+
+
+
+
+/*
+ * @return 	string of time & date in format H:M:S D/M/YYYY
+ */ 
 function get_date() {
 	var currentdate = new Date();
 	return currentdate.getHours()
@@ -53,16 +61,6 @@ Array.prototype.clear = function() {
 	return this;
 }
 
-// cloning an array
-// reference: http://davidwalsh.name/javascript-clone-array
-Array.prototype.clone = function() {
-	return this.slice(0);
-};
-
-
-
-
-
 
 
 // loading another javascript file
@@ -81,9 +79,11 @@ function load_javascript(url, location){
 
 
 
-
-
-// line intersection of two lines in certain range, takes start & end points of the two lines, here be complicated maths
+/*
+ * @param x1, y1, x2, y2		set of number coordinates for the second line
+ * @param x3, y3, x4, y4		set of number coordinates for the second line
+ * @return					boolean whether the two passed lines cross
+ */
 function line_intersect(x1, y1, x2, y2, x3, y3, x4, y4) {
 	var x = ((x1 * y2 - y1 * x2) * (x3 - x4) - (x1 - x2) * (x3 * y4 - y3 * x4)) / ((x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4));
 	var y = ((x1 * y2 - y1 * x2) * (y3 - y4) - (y1 - y2) * (x3 * y4 - y3 * x4)) / ((x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4));
