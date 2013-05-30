@@ -96,7 +96,7 @@ function model_collision_detection() {
 
 			threats.splice(i, 1);
 			model_life_lost();
-			context.restore();
+
 			if (debug) console.log('collision target');
 		}
 
@@ -114,7 +114,6 @@ function model_collision_detection() {
 				threats.splice(i, 1);
 				defenses.splice(j, 1);
 
-				view_audio_effects_play(1);
 
 				if (debug) console.log('collision defense');
 			}
@@ -123,15 +122,11 @@ function model_collision_detection() {
 }
 
 
-//	Levelling up, manages achievements associated with it, as well as sound effects & drawing
+/*
+ * increases the level & increases the difficulty via the rate of incoming lines
+ */
 function model_level_up() {
-	//	As the API requests' content changes rarely, shuffles to maintain randomness of level colours
 	level++;
-
-
-	view_level_shift(30);
-
-	//achievements_check(level, lives, score);
 
 	// increasing the rate of threat adding
 	clearInterval(level_threat_handle);
@@ -141,13 +136,11 @@ function model_level_up() {
 }
 
 
-//	Losing a life, sound effects & acheievement defaulting
+/*
+ * decreases the lives, checks if the game is over or not
+ */
 function model_life_lost() {
 	if (debug) console.log('game life lost');
-
-	view_audio_effects_play(3);
-
-	//achievements_default('SURVIVOR', level);
 
 	if(--lives <= 0) model_finalise();
 }
@@ -173,7 +166,10 @@ function model_finalise() {
 
 
 
-//	Creating levels from JSON using colourlovers' API for styles
+/*
+ * creates levels using colourlovers.com (via ajax) for the colours
+ * moderated to prevent levels with too similar colours
+ */
 function model_levels_initialise() {
 
 	$.ajax({
@@ -185,44 +181,56 @@ function model_levels_initialise() {
 		},
 		success : function(data) {
 
-			// maximum of fifty levels - i for data, j for level_data
-			for (var i = 0, j  = 0; j < 50; i++, j++) { 
-
-				// skips current if not enough colours in the palette
+			// creates at most fifty levels, must have five colours
+			for (var i = 0; level_data.length < 50; i++) {
 				if (data[i].colors.length >= 5) {
-
-					level_data[j] = {
-						complete : (j * 500),	// points needed to complete the level
-						speed    : (j * .5),	// maximum speed of threats
-
+					level_data.push({
+						// game logic, not filled in until shuffled & moderated
+						points : 0,
+						speed : 0,
 						style : {
 							target : {
-								size   : 20,
+								size : 20,
 								ring_1 : hex_to_hsla_array(data[i].colors[0]),
 								ring_2 : hex_to_hsla_array(data[i].colors[1])
 							},
 							lines : {
 								defenses : hex_to_hsla_array(data[i].colors[2]),
-								threats	 : hex_to_hsla_array(data[i].colors[3])
+								threats : hex_to_hsla_array(data[i].colors[3])
 							},
 							gui : {
 								background : hex_to_hsla_array(data[i].colors[4]),
-								text	   : hex_to_hsla_array(data[i].colors[2])
+								text	 : hex_to_hsla_array(data[i].colors[2])
 							}
 						}
-					};
-				} else {
-					j--;
+					});
 				}
 			}
 		}
 	}).done(function() {
 		level_data.shuffle();
+		
+		if (debug) console.log('levels loaded, pre moderation quantity ' + level_data.length);
+		
+		// moderation using euclidean distance
+		for (var i = 0; i < level_data.length; i++) {
+			var background = level_data[i].style.gui.background;
+			var threats = level_data[i].style.lines.threats;
+			var defenses = level_data[i].style.lines.defenses;
 
-		// moderation
-		//for (var i = 0; i < level_data.length; i++) 
-
-		if (debug) console.log('levels loaded');
+			if ((((background[0] - threats[0]) ^ 2 + (background[1] - threats[1]) ^ 2 + (background[2] - threats[2]) ^ 2) ^ .5 < 10) ||
+				(((background[0] - defenses[0]) ^ 2 + (background[1] - defenses[1]) ^ 2 + (background[2] - defenses[2]) ^ 2) ^ .5 < 10)) {
+				level_data.splice(i, 1);
+			}
+		}
+		
+		if (debug) console.log('levels loaded, post moderation quantity ' + level_data.length);
+			
+		// adding game logic data
+		for (var i = 0; i < level_data.length; i++) {
+			level_data[i].points = i * 500;
+			level_data[i].speed = i * .5;			
+		}		
 	});
 
 }

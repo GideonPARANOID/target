@@ -115,8 +115,8 @@ function view_draw_game(level_current, level_next, threats, defenses, level, liv
 	
 	view_draw_footer('LEVEL: ' + level,
 					'LIVES: ' + lives,
-					'DEFENSES: ' + defenses.length + '/' + (Math.floor(level * 1.5) + 3),
-					'SCORE: ' + score);
+					'SCORE: ' + score,
+					'DEFENSES: ' + defenses.length + '/' + (Math.floor(level * 1.5) + 3));
 }
 
 
