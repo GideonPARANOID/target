@@ -311,14 +311,12 @@ function view_draw_options(menu_options) {
 		if (menu_options.selected == 1) context.fillStyle = 'rgba(' + gui.pulse + ', 0, 0, .75)';
 
 		context.textAlign = 'center';
-		context.font = '25px wipeout';
 		context.fillText(options[1], 0, 100);
 
 		if (menu_options.selected == 1) context.fillStyle = 'rgba(255, 255, 255, 1.0)';
 		if (menu_options.selected == 2) context.fillStyle = 'rgba(' + gui.pulse + ', 0, 0, .75)';
 
 		context.textAlign = 'right';
-		context.font = '25px wipeout';
 		context.fillText(options[2], 400, 100);
 	}
 }

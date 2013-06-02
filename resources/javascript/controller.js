@@ -91,40 +91,11 @@ function control_menu_main() {
 
 
 
-
-
-/*
- * starting the game
- */
-function control_game_initialise() {
-	clearInterval(control_menu_handle);
-	Mousetrap.reset();
-
-	/*
-	 * Mousetrap.bind('esc', control_game_pause);
-	 * Mousetrap.bind('p', control_game_pause);
-	 * Mousetrap.bind('enter', control_game_pause);
-	 */
-
-	canvas.onmousemove = control_mouse_position_update;
-	canvas.onmousedown = control_game_mouse_down;
-	canvas.onmouseup   = control_game_mouse_up;
-
-	if (debug) console.log('game initialise');
-
-	model_initialise();
-}
-
-
-
-
-
 var control_menu_handle;
 
 /*
  * creates a menu screen based on the parameters, maximum of three menu options
  * resets controls and sets new ones, automatically does arrow keys & enter if menu items exist
- * rather flexible
  *
  * @param	title				the title of the menu
  * @param	menu_options			object describing menu options	{selected : index, options : [{title : string, functionality: function}]}
@@ -143,7 +114,7 @@ function control_menu(title, menu_options, keyboard_controls, mouse_controls) {
 		canvas.onmouseup	= 	(mouse_controls.onmouseup == undefined)	? null : mouse_controls.onmouseup;
 		canvas.onmousemove = (mouse_controls.onmousemove == undefined)	? null : mouse_controls.onmousemove;
 	}
-	// control setting
+	// setting keyboard controls
 	if (keyboard_controls != null) {
 		for (var i = 0; i < keyboard_controls.length; i++) {
 			Mousetrap.bind(keyboard_controls[i].key, keyboard_controls[i].functionality);
@@ -169,7 +140,9 @@ function control_menu(title, menu_options, keyboard_controls, mouse_controls) {
 		refresh_loop();
 	}
 
-	// refreshes the menu loop, passing in any changed variables again
+	/*
+	 * refreshes the menu loop, passing in any changed variables again
+	 */
 	function refresh_loop() {
 		clearInterval(control_menu_handle);
 
@@ -177,4 +150,41 @@ function control_menu(title, menu_options, keyboard_controls, mouse_controls) {
 			view_draw_gui(title, menu_options, keyboard_controls);
 		}, 30);
 	}
+}
+
+
+
+
+
+
+
+
+
+/*
+ * starting the game
+ */
+function control_game_initialise() {
+	clearInterval(control_menu_handle);
+	Mousetrap.reset();
+	
+	Mousetrap.bind('esc', control_game_pause);
+	Mousetrap.bind('p', control_game_pause);
+	
+	canvas.onmousemove = control_mouse_position_update;
+	canvas.onmousedown = control_game_mouse_down;
+	canvas.onmouseup   = control_game_mouse_up;
+	
+	if (debug) console.log('game initialise');
+	
+	model_initialise();
+}
+
+
+
+
+
+function control_game_pause() {
+	model_pause();
+
+	if (debug) console.log('game pause');
 }

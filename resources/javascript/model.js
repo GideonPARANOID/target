@@ -7,7 +7,7 @@ var lives;
 var score;
 var player;
 
-var game_handle, level_threat_handle;
+var game_handle;
 
 
 var level_data = new Array();		//	Level data
@@ -30,26 +30,31 @@ function model_initialise() {
 	threats.clear();
 	defenses.clear();
 	clearInterval(game_handle);
-	clearInterval(level_threat_handle);
-
+	
 	game_handle = setInterval(model_loop, 30);
-	level_threat_handle = setInterval(model_threat_add, 3000);
 }
 
 
+
+var threat_timer;
 
 /*
  * main game loop
  */
 function model_loop() {
-	if (game) {
-		view_draw_game(level_data[level].style, level_data[level + 1].style, threats, defenses, level, lives, score);
-		
-		model_collision_detection();
-		control_game_defense_current();
+	view_draw_game(level_data[level].style, level_data[level + 1].style, threats, defenses, level, lives, score);
 
-		//	Score iteration (relative to level) & level up comparison
-		if ((score++) == ((level) * 500)) model_level_up();
+	model_collision_detection();
+	control_game_defense_current();
+
+	// increasing the score & level up checking
+	if (++score == level_data[level].points) model_level_up();
+	
+	// adding threats at an increasing rate
+	if (--threat_timer == 0) {
+		model_threat_add();
+
+		threat_timer = 3000 - (level * 200);
 	}
 }
 
@@ -58,13 +63,11 @@ function model_loop() {
  * adds an incoming line
  */
 function model_threat_add() {
-	if (game) {
-		threats.push({
-			speed	 : Math.ceil(level * 2 * Math.random()),
-			distance : (((canvas.width * .5) ^ 2) + ((canvas.height * .5) ^ 2)) ^ .5,
-			angle	 : Math.PI * 2* Math.random()
-		});
-	}
+	threats.push({
+		speed : Math.ceil(level * 2 * Math.random()),
+		distance : (((canvas.width * .5) ^ 2) + ((canvas.height * .5) ^ 2)) ^ .5,
+		angle : Math.PI * 2* Math.random()
+	});
 }
 
 
@@ -127,10 +130,6 @@ function model_collision_detection() {
  */
 function model_level_up() {
 	level++;
-
-	// increasing the rate of threat adding
-	clearInterval(level_threat_handle);
-	level_threat_handle = setInterval(model_threat_add, 3000 - (level * 200));
 
 	if (debug) console.log('game level up, next level score ' + level_data[level].score);
 }
@@ -235,12 +234,12 @@ function model_levels_initialise() {
 
 }
 
-
+/*
+ * if the game is running, pauses the game, if the game isn't running, continues
+ */
 function model_pause() {
-
-
-
-
+	if (game_handle == null)	game_handle = setInterval(model_loop, 30);
+	else						clearInterval(game_handle);
 }
 
 
