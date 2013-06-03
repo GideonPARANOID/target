@@ -186,7 +186,7 @@ function view_draw_target(size, colour_1, colour_2) {
 	} else {
 		if (target.pulse != 0)	target.pulse--;
 		else						target.up = true;
-	}
+ 	}
 	
 	context.strokeStyle = colour_1;
 	context.beginPath();

@@ -80,7 +80,10 @@ function control_menu_main() {
 			functionality : control_menu_achievements
 		}, {
 			title : 'PLAY',
-			functionality : control_game_initialise
+			functionality : function() {
+				model_initialise();
+				control_game_set();
+			}
 		}, {
 			title : 'HIGH SCORES',
 			functionality : control_menu_high_scores
@@ -163,7 +166,7 @@ function control_menu(title, menu_options, keyboard_controls, mouse_controls) {
 /*
  * starting the game
  */
-function control_game_initialise() {
+function control_game_set() {
 	clearInterval(control_menu_handle);
 	Mousetrap.reset();
 	
@@ -174,17 +177,29 @@ function control_game_initialise() {
 	canvas.onmousedown = control_game_mouse_down;
 	canvas.onmouseup   = control_game_mouse_up;
 	
-	if (debug) console.log('game initialise');
-	
-	model_initialise();
+	if (debug) console.log('game start');
 }
 
 
 
 
 
+
 function control_game_pause() {
+	clearInterval(control_menu_handle);
+
 	model_pause();
 
+	control_menu('PAUSE', {
+		selected : 0,
+		options : [{
+			title : 'UNPAUSE',
+			functionality : function() {
+				control_game_set();
+				model_pause();
+			}
+		}]
+	}, null, null);
+	
 	if (debug) console.log('game pause');
 }

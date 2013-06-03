@@ -238,8 +238,12 @@ function model_levels_initialise() {
  * if the game is running, pauses the game, if the game isn't running, continues
  */
 function model_pause() {
-	if (game_handle == null)	game_handle = setInterval(model_loop, 30);
-	else						clearInterval(game_handle);
+	if (game_handle == null)	{
+		game_handle = setInterval(model_loop, 30);
+	} else {
+		clearInterval(game_handle);
+		game_handle = null;
+	}
 }
 
 
