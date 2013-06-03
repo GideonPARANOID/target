@@ -25,7 +25,9 @@ function control_mouse_position_update(e) {
 }
 
 
-//	For getting the start of the line drawn by a player & maintaining the end point at mouse for temp line drawing (mouse !up)
+/*
+ * for getting the start of the line drawn by a player & maintaining the end point at mouse for temp line drawing (mouse !up)
+ */
 function control_game_mouse_down(e) {
 	if (e.which == 1) {
 		control_mouse_position_update(e);
@@ -36,19 +38,70 @@ function control_game_mouse_down(e) {
 }
 
 
-//	Drawing the line the user is currently drawing - if the mouse is still down
+/*
+ * drawing the line the user is currently drawing - if the mouse is still down
+ */
 function control_game_defense_current() {
 	if (mouse.down) view_draw_defense_current(mouse.start.x, mouse.start.y, mouse.end.x, mouse.end.y);
 }
 
 
-//	Adds another set of coordinates to the array of lines
+/*
+ * adds another set of coordinates to the array of lines
+ */
 function control_game_mouse_up(e) {
 	if (e.which == 1) {
 		model_defense_add(mouse.start.x, mouse.start.y, mouse.end.x, mouse.end.y);
 		mouse.down = false;
 	}
 }
+
+
+
+
+
+
+
+
+
+
+/*
+ * setting the game's controls
+ */
+function control_game_set() {
+	clearInterval(control_menu_handle);
+	Mousetrap.reset();
+	
+	Mousetrap.bind('esc', control_game_pause);
+	Mousetrap.bind('p', control_game_pause);
+	
+	canvas.onmousemove = control_mouse_position_update;
+	canvas.onmousedown = control_game_mouse_down;
+	canvas.onmouseup   = control_game_mouse_up;
+}
+
+
+/*
+ * pausing the game
+ */
+function control_game_pause() {
+	clearInterval(control_menu_handle);
+	
+	model_pause();
+	
+	control_menu('PAUSE', {
+		selected : 0,
+		options : [{
+			title : 'UNPAUSE',
+			functionality : function() {
+				control_game_set();
+				model_pause();
+			}
+		}]
+	}, null, null);
+}
+
+
 
 
 
@@ -153,53 +206,4 @@ function control_menu(title, menu_options, keyboard_controls, mouse_controls) {
 			view_draw_gui(title, menu_options, keyboard_controls);
 		}, 30);
 	}
-}
-
-
-
-
-
-
-
-
-
-/*
- * starting the game
- */
-function control_game_set() {
-	clearInterval(control_menu_handle);
-	Mousetrap.reset();
-	
-	Mousetrap.bind('esc', control_game_pause);
-	Mousetrap.bind('p', control_game_pause);
-	
-	canvas.onmousemove = control_mouse_position_update;
-	canvas.onmousedown = control_game_mouse_down;
-	canvas.onmouseup   = control_game_mouse_up;
-	
-	if (debug) console.log('game start');
-}
-
-
-
-
-
-
-function control_game_pause() {
-	clearInterval(control_menu_handle);
-
-	model_pause();
-
-	control_menu('PAUSE', {
-		selected : 0,
-		options : [{
-			title : 'UNPAUSE',
-			functionality : function() {
-				control_game_set();
-				model_pause();
-			}
-		}]
-	}, null, null);
-	
-	if (debug) console.log('game pause');
 }

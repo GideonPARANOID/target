@@ -32,6 +32,8 @@ function model_initialise() {
 	clearInterval(game_handle);
 	
 	game_handle = setInterval(model_loop, 30);
+
+	if (debug) console.log('game start');
 }
 
 
@@ -149,14 +151,9 @@ function model_life_lost() {
 function model_finalise() {
 	if (debug) console.log('game over');
 
-	game = false;
-
 	clearInterval(game_handle);
-	clearInterval(level_threat_handle);
 
-	//achievements_unlock('HIGH SCORES', score);
-
-	control_gui_game_over(level, score);
+	control_game_over(level, score);
 }
 
 
@@ -170,7 +167,6 @@ function model_finalise() {
  * moderated to prevent levels with too similar colours
  */
 function model_levels_initialise() {
-
 	$.ajax({
 		url : 'http://www.colourlovers.com/api/palettes?format=json&numResults=100&jsonCallback=?',
 		dataType : 'jsonp',
@@ -240,9 +236,13 @@ function model_levels_initialise() {
 function model_pause() {
 	if (game_handle == null)	{
 		game_handle = setInterval(model_loop, 30);
+		
+		if (debug) console.log('game resume');
 	} else {
 		clearInterval(game_handle);
 		game_handle = null;
+		
+		if (debug) console.log('game pause');
 	}
 }
 

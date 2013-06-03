@@ -21,12 +21,6 @@ function hex_to_hsla_array(hex) {
 
 
 
-
-
-
-
-
-
 /*
  * @return 	string of time & date in format H:M:S D/M/YYYY
  */ 
@@ -35,14 +29,16 @@ function get_date() {
 	return currentdate.getHours()
 		 + ':' + currentdate.getMinutes()
 		 + ':' + currentdate.getSeconds()
-		 + ' '+ currentdate.getDay()
-		 + '/'+currentdate.getMonth()
+		 + ' ' + currentdate.getDay()
+		 + '/' + currentdate.getMonth()
 		 + '/' + currentdate.getFullYear();
 }
 
 
-// defining the function shuffle for arrays
-// reference: http://stackoverflow.com/a/6274398/1323970
+/*
+ * shuffles an array
+ * reference: http://stackoverflow.com/a/6274398/1323970
+ */ 
 Array.prototype.shuffle = function() {
 	for (var i = this.length - 1; i > 0; i--) {
 		var j = Math.floor(Math.random() * (i + 1));
@@ -50,12 +46,12 @@ Array.prototype.shuffle = function() {
 		this[i] = this[j];
 		this[j] = temp;
 	}
-
 	return this;
 }
 
-//	defining the function clear for arrays
-//	references: me!
+/*
+ * empties an array
+ */
 Array.prototype.clear = function() {
 	this.length = 0;
 	return this;
@@ -63,14 +59,15 @@ Array.prototype.clear = function() {
 
 
 
-// loading another javascript file
-// reference: http://stackoverflow.com/a/950146/1323970
+/*
+ * loading another javascript file
+ * reference: http://stackoverflow.com/a/950146/1323970
+ */
 function load_javascript(url, location){
 	var script = document.createElement('script');
 	script.type = 'text/javascript';
 	script.src = url;
 	document.getElementsByTagName('head')[0].appendChild(script);
-
 	script.onload = console.log(location + ' javascript loaded ' + url);
 }
 

@@ -1,63 +1,9 @@
-//	Functions for drawing game components on the canvas, includes gui
-//	Also handles music, generally the appearance of the game
-
-
-// defaulting & structure definition
-var level_shift = {
-	target : {
-		size   : 20,
-		ring_1 : [0, 0, 0, 0],
-		ring_2 : [0, 0, 0, 0]
-	},
-	lines : {
-		threats	 : [0, 0, 0, 0],
-		defenses : [0, 0, 0, 0]
-	},
-	gui: {
-		background : [0, 0, 0, 0],
-		text	   : [0, 0, 0, 0]
-	},
-	timer : 0
-}
-
-//	Temp variables for target arcs spinning
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /*
- * draws a line between the sets of coordinates passed in
- * @param x1, y1, x2, y2	the start & end coordinates of an end of a lines
+ * @author	gideon mw jones (@gideonparanoid)
+ * @version	who knows
+ *
+ * functions for drawing game components on the canvas, includes gui
  */
-function view_draw_defense_current(x1, y1, x2, y2) {
-	context.beginPath();
-	context.moveTo(x1, y1);
-	context.lineTo(x2, y2);
-	context.stroke();
-	context.closePath();
-}
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -83,6 +29,21 @@ var target = {
 var level_shift_timer = 0;
 var level_shift = 0;
 
+
+
+
+
+/*
+ * draws a line between the sets of coordinates passed in
+ * @param x1, y1, x2, y2	the start & end coordinates of an end of a lines
+ */
+function view_draw_defense_current(x1, y1, x2, y2) {
+	context.beginPath();
+	context.moveTo(x1, y1);
+	context.lineTo(x2, y2);
+	context.stroke();
+	context.closePath();
+}
 
 
 
