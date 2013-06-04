@@ -61,12 +61,8 @@ function control_game_mouse_up(e) {
 
 
 
-
-
-
-
 /*
- * setting the game's controls
+ * setting the game's controls, both keyboard & mouse
  */
 function control_game_set() {
 	clearInterval(control_menu.handle);
@@ -85,8 +81,6 @@ function control_game_set() {
  * pausing the game
  */
 function control_game_pause() {
-	clearInterval(control_menu.handle);
-	
 	model_pause();
 	
 	control_menu('PAUSE', {
@@ -98,7 +92,7 @@ function control_game_pause() {
 				model_pause();
 			}
 		}, {
-			title : 'MAIN MENU',
+			title : 'RETURN TO MENU',
 			functionality : function() {
 				control_menu_main();
 				model_finalise();
@@ -107,6 +101,19 @@ function control_game_pause() {
 	}, null, null);
 }
 
+
+
+
+function control_game_over() {
+
+
+	control_menu('GAME OVER', {
+		options : [{
+			title : 'RETURN TO MENU',
+			functionality: control_men
+		}],
+	}, null, null);
+}
 
 
 
@@ -175,8 +182,11 @@ function control_menu(title, menu_options, keyboard_controls, mouse_controls) {
 
 	// automatically setting menu keyboard controls if there are menu options
 	if (menu_options != null) {
-		// only sets left/right navigation is there is more than one option
-		if (menu_options.options.length > 1) {
+		if (menu_options.options.length == 1) {
+			menu_options.selected = 0;
+
+		// only sets left/right navigation is there is more than one option	
+		} else if (menu_options.options.length > 1) {			
 			Mousetrap.bind('left', function() {
 				menu_options.selected = (menu_options.selected < 1) ? menu_options.options.length - 1 : menu_options.selected - 1;
 				refresh_loop();

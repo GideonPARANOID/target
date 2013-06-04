@@ -21,7 +21,7 @@ function model_initialise() {
 	level = 1;
 	player = 'Gideon';
 
-	game = true;
+	view_draw_initialise();
 
 	// clearing
 	threats.clear();
@@ -65,7 +65,8 @@ function model_threat_add() {
 	threats.push({
 		speed : Math.ceil(level * 2 * Math.random()),
 		distance : (((canvas.width * .5) ^ 2) + ((canvas.height * .5) ^ 2)) ^ .5,
-		angle : Math.PI * 2* Math.random()
+		angle : Math.PI * 2* Math.random(),
+		life : -1
 	});
 }
 
@@ -75,6 +76,7 @@ function model_threat_add() {
  */
 function model_defense_add(x1, y1, x2, y2) {
 	defenses.push({
+		life : -1,
 		start : {
 			x : x1,
 			y : y1
@@ -113,9 +115,11 @@ function model_collision_detection() {
 							   defenses[j].end.x,
 							   defenses[j].end.y)) {
 
+				threats[i].life = 30;
+				defenses[j].life = 30;
+				
 				threats.splice(i, 1);
 				defenses.splice(j, 1);
-
 
 				if (debug) console.log('collision defense');
 			}

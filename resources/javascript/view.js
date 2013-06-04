@@ -8,6 +8,7 @@
 
 
 
+
 // gui pulsing and shifting
 var gui = {
 	pulse  : 255,
@@ -17,19 +18,14 @@ var gui = {
 };
 
 
-// arc spinning
-var target = {
-	ring_1: 0,
-	ring_2: 0,
-	pulse : 0,
-	up	  : true
-};
-
-
 var level_shift_timer = 0;
 var level_shift = 0;
 
 
+
+function view_draw_initialise() {
+	context.lineWidth = 5;	
+}
 
 
 
@@ -58,9 +54,7 @@ function view_draw_defense_current(x1, y1, x2, y2) {
  * @param score			the current score
  */
 function view_draw_game(level_current, level_next, threats, defenses, level, lives, score) {
-	
-	context.lineWidth = 5;
-	
+		
 	if (level != level_shift) 		level_shift = 60;
 	else if (level_shift_timer == 0)	level_shift = level;
 	else if (level_shift_timer > 0)	level_shift_timer--;
@@ -101,14 +95,11 @@ function view_draw_background(background) {
  * @param list		an array of threats
  */
 function view_draw_threats(colour, list) {
-	// maximum distance from the center, for line length, pythagoras
-	var trig = (((canvas.width / 2) ^ 2) + ((canvas.height / 2) ^ 2)) ^ .5;
-
 	context.strokeStyle = colour;
 	
 	for (var i = 0; i < threats.length; i++) {
 		context.beginPath();
-		context.moveTo(Math.cos(list[i].angle) * trig, Math.sin(list[i].angle) * trig);
+		context.moveTo(Math.cos(list[i].angle) * TRIG, Math.sin(list[i].angle) * TRIG);
 		context.lineTo(Math.cos(list[i].angle) * list[i].distance, Math.sin(list[i].angle) * list[i].distance);
 		context.stroke();
 		context.closePath();
@@ -134,24 +125,47 @@ function view_draw_defenses(colour, list) {
 
 
 
+
+
 /*
  * @param	size			the size of the target
  * @param	colour_1		the colour of the inner ring
  * @param	colour_2		the colour of the outer ring
  */
 function view_draw_target(size, colour_1, colour_2) {
+	
+	// constant - maximum distance from the center, for line length, pythagoras
+	var TRIG = (((canvas.width / 2) ^ 2) + ((canvas.height / 2) ^ 2)) ^ .5;
 
-	if (target.up) {
-		if (target.pulse != 20)	target.pulse++;
-		else 					target.up = false;
+	// initialising 
+	if (view_draw_target.ring_1 == null) {
+		view_draw_target.ring_1 = 0;
+		view_draw_target.ring_2 = 0;
+		view_draw_target.pulse = 0;
+		view_draw_target.up = true;		
+	}
+
+	
+
+	if (view_draw_target.up) {
+		if (view_draw_target.pulse != 20) {
+			view_draw_target.pulse++;
+		} else {
+			view_draw_target.up = false;
+		}
 	} else {
-		if (target.pulse != 0)	target.pulse--;
-		else						target.up = true;
- 	}
+		if (view_draw_target.pulse != 0) {
+			view_draw_target.pulse--;
+		} else {
+			view_draw_target.up = true;
+		}
+	}
 	
 	context.strokeStyle = colour_1;
 	context.beginPath();
-	context.arc(0, 0, size, target.ring_1 += Math.PI / 30, target.ring_1 + Math.PI);
+	context.arc(0, 0, size,
+				view_draw_target.ring_1 += Math.PI / 30,
+				view_draw_target.ring_1 + Math.PI);
 	context.stroke();
 	context.closePath();
 	
@@ -160,9 +174,13 @@ function view_draw_target(size, colour_1, colour_2) {
 	
 	// preventing invalid param issues
 	if (size < 20) {
-		context.arc(0, 0, size + 10, target.ring_2 -= Math.PI / 30, target.ring_2 + Math.PI);
+		context.arc(0, 0, size + 10,
+					view_draw_target.ring_2 -= Math.PI / 30,
+					view_draw_target.ring_2 + Math.PI);
 	} else {
-		context.arc(0, 0, size - 10, target.ring_2 -= Math.PI / 30, target.ring_2 + Math.PI);
+		context.arc(0, 0, size - 10,
+					view_draw_target.ring_2 -= Math.PI / 30,
+					view_draw_target.ring_2 + Math.PI);
 	}
 	context.stroke();
 	context.closePath();
@@ -220,8 +238,9 @@ function view_draw_title(title) {
 }
 
 
-// draws the footer of the screen displaying the strings passed
+
 /*
+ * draws the footer of the screen displaying the strings passed
  * @param one	string for the furthest left item
  * @param two	string for the closest left item
  * @param three	string for the furthest right item
@@ -244,6 +263,9 @@ function view_draw_footer(one, two, three, four) {
 	context.fillText(three, canvas.width / 16, canvas.height * .5);
 	context.fillText(four, canvas.width / 4, canvas.height * .5);
 }
+
+
+
 
 
 function view_draw_options(menu_options) {
@@ -281,19 +303,6 @@ function view_draw_options(menu_options) {
 		context.fillText(options[2], 400, 100);
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
