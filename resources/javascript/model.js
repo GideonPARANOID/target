@@ -7,9 +7,6 @@ var lives;
 var score;
 var player;	//	name from twitter sign in mayber or otherwise for server side leaderboards
 
-var game_handle;
-
-
 var level_data = new Array();		// level data
 var defenses = new Array();		// lines the player draws
 var threats = new Array();		// incoming lines
@@ -29,9 +26,9 @@ function model_initialise() {
 	// clearing
 	threats.clear();
 	defenses.clear();
-	clearInterval(game_handle);
+	clearInterval(model_loop.handle);
 	
-	game_handle = setInterval(model_loop, 30);
+	model_loop.handle = setInterval(model_loop, 30);
 
 	if (debug) console.log('game start');
 }
@@ -149,7 +146,7 @@ function model_life_lost() {
 
 //	Game over refreshing
 function model_finalise() {
-	clearInterval(game_handle);
+	clearInterval(model_loop.handle);
 
 	if (debug) console.log('game end');
 }
@@ -232,13 +229,13 @@ function model_levels_initialise() {
  * if the game is running, pauses the game, if the game isn't running, continues
  */
 function model_pause() {
-	if (game_handle == null)	{
-		game_handle = setInterval(model_loop, 30);
+	if (model_loop.handle == null)	{
+		model_loop.handle = setInterval(model_loop, 30);
 		
 		if (debug) console.log('game resume');
 	} else {
-		clearInterval(game_handle);
-		game_handle = null;
+		clearInterval(model_loop.handle);
+		model_loop.handle = null;
 		
 		if (debug) console.log('game pause');
 	}

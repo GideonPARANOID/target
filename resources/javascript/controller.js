@@ -69,7 +69,7 @@ function control_game_mouse_up(e) {
  * setting the game's controls
  */
 function control_game_set() {
-	clearInterval(control_menu_handle);
+	clearInterval(control_menu.handle);
 	Mousetrap.reset();
 	
 	Mousetrap.bind('esc', control_game_pause);
@@ -85,7 +85,7 @@ function control_game_set() {
  * pausing the game
  */
 function control_game_pause() {
-	clearInterval(control_menu_handle);
+	clearInterval(control_menu.handle);
 	
 	model_pause();
 	
@@ -145,8 +145,6 @@ function control_menu_main() {
 
 
 
-var control_menu_handle;
-
 /*
  * creates a menu screen based on the parameters, maximum of three menu options
  * resets controls and sets new ones, automatically does arrow keys & enter if menu items exist
@@ -193,16 +191,15 @@ function control_menu(title, menu_options, keyboard_controls, mouse_controls) {
 		Mousetrap.bind('enter', function() {			
 			menu_options.options[menu_options.selected].functionality();
 		});
-		refresh_loop();
 	}
 
 	/*
 	 * refreshes the menu loop, passing in any changed variables again
 	 */
 	function refresh_loop() {
-		clearInterval(control_menu_handle);
+		clearInterval(control_menu.handle);
 		
-		control_menu_handle = setInterval(function() {
+		control_menu.handle = setInterval(function() {
 			view_draw_gui(title, menu_options, keyboard_controls);
 		}, 30);
 	}
