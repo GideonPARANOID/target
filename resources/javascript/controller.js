@@ -97,17 +97,15 @@ function control_game_pause() {
 				control_game_set();
 				model_pause();
 			}
+		}, {
+			title : 'MAIN MENU',
+			functionality : function() {
+				control_menu_main();
+				model_finalise();
+			}
 		}]
 	}, null, null);
 }
-
-
-
-
-
-
-
-
 
 
 
@@ -192,7 +190,9 @@ function control_menu(title, menu_options, keyboard_controls, mouse_controls) {
 			});
 		}
 
-		Mousetrap.bind('enter', menu_options.options[menu_options.selected].functionality);
+		Mousetrap.bind('enter', function() {			
+			menu_options.options[menu_options.selected].functionality();
+		});
 		refresh_loop();
 	}
 
@@ -201,7 +201,7 @@ function control_menu(title, menu_options, keyboard_controls, mouse_controls) {
 	 */
 	function refresh_loop() {
 		clearInterval(control_menu_handle);
-
+		
 		control_menu_handle = setInterval(function() {
 			view_draw_gui(title, menu_options, keyboard_controls);
 		}, 30);

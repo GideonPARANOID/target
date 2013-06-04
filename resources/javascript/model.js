@@ -5,20 +5,20 @@
 
 var lives;
 var score;
-var player;
+var player;	//	name from twitter sign in mayber or otherwise for server side leaderboards
 
 var game_handle;
 
 
-var level_data = new Array();		//	Level data
-var defenses = new Array();		//	Lines the player draws
-var threats = new Array();		//	Incoming lines
+var level_data = new Array();		// level data
+var defenses = new Array();		// lines the player draws
+var threats = new Array();		// incoming lines
 
 
-//	Setting up the model, used for replaying the game too
+/*
+ * clearing & starting the model loop
+ */
 function model_initialise() {
-	if (debug) console.log('game start');
-
 	lives = 5;
 	score = 0;
 	level = 1;
@@ -149,11 +149,9 @@ function model_life_lost() {
 
 //	Game over refreshing
 function model_finalise() {
-	if (debug) console.log('game over');
-
 	clearInterval(game_handle);
 
-	control_game_over(level, score);
+	if (debug) console.log('game end');
 }
 
 
