@@ -43,7 +43,9 @@ var threat_timer = 1;
 function model_loop() {
 	view_draw_game(level_data[level].style, level_data[level + 1].style, threats, defenses, level, lives, score);
 
+	model_life_and_death();
 	model_collision_detection();
+	
 	control_game_defense_current();
 
 	// increasing the score & level up checking
@@ -94,41 +96,76 @@ function model_defense_add(x1, y1, x2, y2) {
 }
 
 
-//	Collision detection, returns an object containing indices of colliding threats & defenses
+/*
+ * detects collisons between defenses and threats
+ * sets the life of threats & defenses colliding
+ */
 function model_collision_detection() {
+	// looks a little unweildy, but isn't too bad
+	// worst case ~O(n^2)
+	
 	for (var i = 0; i < threats.length; i++) {
-		//	Target collision detection
-		if ((threats[i].distance -= threats[i].speed) < level_data[level].style.target.size) {
+		if (threats[i].life == -1) {	
 
-			threats.splice(i, 1);
-			model_life_lost();
+			// target collision detection
+			if ((threats[i].distance -= threats[i].speed) < level_data[level].style.target.size) {
 
-			if (debug) console.log('collision target');
-		}
+							threats[i].life = 30;
+				model_life_lost();
 
-		//	Defense collision detection
-		for (var j = 0; j < defenses.length; j++) {
-			if (line_intersect(Math.cos(threats[i].angle) * threats[i].distance,
-							   Math.sin(threats[i].angle) * threats[i].distance,
-							   Math.cos(threats[i].angle) * (threats[i].distance - threats[i].speed),
-							   Math.sin(threats[i].angle) * (threats[i].distance - threats[i].speed),
-							   defenses[j].start.x,
-							   defenses[j].start.y,
-							   defenses[j].end.x,
-							   defenses[j].end.y)) {
-
-				threats[i].life = 30;
-				defenses[j].life = 30;
+				if (debug) console.log('collision target');
 				
-				threats.splice(i, 1);
-				defenses.splice(j, 1);
+			} else {
+				// defense collision detection
+				for (var j = 0; j < defenses.length; j++) {
+					if (defenses[j].life == -1) {
 
-				if (debug) console.log('collision defense');
+						if (line_intersect(Math.cos(threats[i].angle) * threats[i].distance,
+								Math.sin(threats[i].angle) * threats[i].distance,
+								Math.cos(threats[i].angle) * (threats[i].distance - threats[i].speed),
+								Math.sin(threats[i].angle) * (threats[i].distance - threats[i].speed),
+								defenses[j].start.x,
+								defenses[j].start.y,
+								defenses[j].end.x,
+								defenses[j].end.y)) {
+
+							threats[i].life = 30;
+							defenses[j].life = 30;
+
+							if (debug) console.log('collision defense');
+						}
+					}
+				}
+			}
+		}		
+	}
+}
+
+
+/*
+ * splices away any lines (threats & defenses) which have no life left
+ */
+function model_life_and_death() {
+	for (var i = 0; i < threats.length; i++) {
+		if (threats[i].life != -1) {
+			if (--threats[i].life == 0) {
+				threats.splice(i, 1);
+
+				if (debug) console.log('threat removed');
+			}
+		}
+	}
+
+	for (var i = 0; i < defenses.length; i++) {
+		if (defenses[i].life != -1) {
+			if (--defenses[i].life == 0) {
+				defenses.splice(i, 1);
+
+				if (debug) console.log('defense removed');
 			}
 		}
 	}
 }
-
 
 /*
  * increases the level & increases the difficulty via the rate of incoming lines

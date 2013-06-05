@@ -23,8 +23,6 @@ var level_shift = 0;
 
 function view_draw_initialise() {
 	context.lineWidth = 5;
-
-	// constant - maximum distance from the center, for line length, pythagoras
 }
 
 
@@ -65,13 +63,13 @@ function view_draw_game(level_current, level_next, threats, defenses, level, liv
 	view_draw_threats(view_level_shift(level_current.lines.threats, level_next.lines.threats), threats);
 	view_draw_defenses(view_level_shift(level_current.lines.defenses, level_next.lines.defenses), defenses);
 	view_draw_target(level_current.target.size,
-					 view_level_shift(level_current.target.ring_1, level_next.target.ring_1),
-					 view_level_shift(level_current.target.ring_2, level_next.target.ring_2));
+		view_level_shift(level_current.target.ring_1, level_next.target.ring_1),
+		view_level_shift(level_current.target.ring_2, level_next.target.ring_2));
 	
 	view_draw_footer('LEVEL: ' + level,
-					'LIVES: ' + lives,
-					'SCORE: ' + score,
-					'DEFENSES: ' + defenses.length + '/' + (Math.floor(level * 1.5) + 3));
+		'LIVES: ' + lives,
+		'SCORE: ' + score,
+		'DEFENSES: ' + defenses.length + '/' + (Math.floor(level * 1.5) + 3));
 }
 
 
@@ -91,39 +89,52 @@ function view_draw_background(background) {
 }
 
 
+
+
 /*
- * @param colour		hsla colour of the threats
+ * @param colour		colour of the threats
  * @param list		an array of threats
  */
 function view_draw_threats(colour, list) {
-	context.strokeStyle = colour;
-	
 	for (var i = 0; i < threats.length; i++) {
-		context.beginPath();
-		context.moveTo(Math.cos(list[i].angle) * trig, Math.sin(list[i].angle) * trig);
-		context.lineTo(Math.cos(list[i].angle) * list[i].distance, Math.sin(list[i].angle) * list[i].distance);
-		context.stroke();
-		context.closePath();
+		view_draw_line(Math.cos(list[i].angle) * trig,
+			Math.sin(list[i].angle) * trig,
+			Math.cos(list[i].angle) * list[i].distance,
+			Math.sin(list[i].angle) * list[i].distance,
+			(threats[i].life == -1) ? threats[i].life : --threats[i].life,
+			colour);
 	}
 }
 
 
 /*
- * @param colour		hsla colour of the defenses
+ * @param colour		colour of the defenses
  * @param list		an array of defenses
  */
 function view_draw_defenses(colour, list) {
+	for (var i = 0; i < list.length; i++) {
+		view_draw_line(list[i].start.x,
+			list[i].start.y,
+			list[i].end.x,
+			list[i].end.y,
+			(defenses[i].life == -1) ? defenses[i].life : --defenses[i].life,
+			colour);
+	}
+}
+
+
+
+function view_draw_line(x1, y1, x2, y2, life, colour) {
 	context.strokeStyle = colour;
 	
-	for (var i = 0; i < list.length; i++) {
+	if (life == -1) {
 		context.beginPath();
-		context.moveTo(list[i].start.x, list[i].start.y);
-		context.lineTo(list[i].end.x, list[i].end.y);
+		context.moveTo(x1, y1);
+		context.lineTo(x2, y2);
 		context.stroke();
 		context.closePath();
 	}
 }
-
 
 
 
@@ -142,8 +153,6 @@ function view_draw_target(size, colour_1, colour_2) {
 		view_draw_target.up = true;		
 	}
 
-	
-
 	if (view_draw_target.up) {
 		if (view_draw_target.pulse != 20) {
 			view_draw_target.pulse++;
@@ -161,8 +170,8 @@ function view_draw_target(size, colour_1, colour_2) {
 	context.strokeStyle = colour_1;
 	context.beginPath();
 	context.arc(0, 0, size,
-				view_draw_target.ring_1 += Math.PI / 30,
-				view_draw_target.ring_1 + Math.PI);
+		view_draw_target.ring_1 += Math.PI / 30,
+		view_draw_target.ring_1 + Math.PI);
 	context.stroke();
 	context.closePath();
 	
@@ -172,12 +181,12 @@ function view_draw_target(size, colour_1, colour_2) {
 	// preventing invalid param issues
 	if (size < 20) {
 		context.arc(0, 0, size + 10,
-					view_draw_target.ring_2 -= Math.PI / 30,
-					view_draw_target.ring_2 + Math.PI);
+			view_draw_target.ring_2 -= Math.PI / 30,
+			view_draw_target.ring_2 + Math.PI);
 	} else {
 		context.arc(0, 0, size - 10,
-					view_draw_target.ring_2 -= Math.PI / 30,
-					view_draw_target.ring_2 + Math.PI);
+			view_draw_target.ring_2 -= Math.PI / 30,
+			view_draw_target.ring_2 + Math.PI);
 	}
 	context.stroke();
 	context.closePath();
@@ -193,10 +202,10 @@ function view_draw_target(size, colour_1, colour_2) {
  */
 function view_level_shift(data_component, shift_component) {
 	return 'hsla(' + Math.ceil(data_component[0] + (shift_component[0] * level_shift_timer))
-	+ ', ' + Math.ceil(data_component[1] + (shift_component[1] * level_shift_timer))
-	+ '%, ' + Math.ceil(data_component[2] + (shift_component[2] * level_shift_timer))
-	+ '%, ' + Math.ceil(data_component[3] + (shift_component[3] * level_shift_timer))
-	+ ')';
+		+ ', ' + Math.ceil(data_component[1] + (shift_component[1] * level_shift_timer))
+		+ '%, ' + Math.ceil(data_component[2] + (shift_component[2] * level_shift_timer))
+		+ '%, ' + Math.ceil(data_component[3] + (shift_component[3] * level_shift_timer))
+		+ ')';
 }
 
 
