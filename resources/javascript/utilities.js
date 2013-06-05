@@ -60,7 +60,7 @@ Array.prototype.clear = function() {
 
 
 /*
- * loading another javascript file
+ * loading a javascript file
  * reference: http://stackoverflow.com/a/950146/1323970
  */
 function load_javascript(url, location){

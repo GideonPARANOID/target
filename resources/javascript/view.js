@@ -6,9 +6,6 @@
  */
 
 
-
-
-
 // gui pulsing and shifting
 var gui = {
 	pulse  : 255,
@@ -18,8 +15,6 @@ var gui = {
 };
 
 
-var level_shift_timer = 0;
-var level_shift = 0;
 
 function view_draw_initialise() {
 	context.lineWidth = 5;
@@ -42,6 +37,7 @@ function view_draw_defense_current(x1, y1, x2, y2) {
 
 
 
+
 /*
  * @param level_current	an object containing the style of the current level
  * @param level_next		an object containing the style of the next level (for shifting purposes)
@@ -52,19 +48,24 @@ function view_draw_defense_current(x1, y1, x2, y2) {
  * @param score			the current score
  */
 function view_draw_game(level_current, level_next, threats, defenses, level, lives, score) {
-		
-	if (level != level_shift) 		level_shift = 60;
-	else if (level_shift_timer == 0)	level_shift = level;
-	else if (level_shift_timer > 0)	level_shift_timer--;
+
+	// defaulting static variables
+	if (view_draw_game.timer == null) view_draw_game.timer = 0;
+	if (view_draw_game.shift == null) view_draw_game.shift = 0;
+
+	// detecting level transitions
+	if (level != view_draw_game.timer) 	view_draw_game.shift = 30;
+	else if (view_draw_game.timer == 0)	view_draw_game.shift = level;
+	else if (view_draw_game.timer > 0)	view_draw_game.timer--;
 	
 	
 	// drawing game & gui elements
-	view_draw_background(view_level_shift(level_current.gui.background, level_next.gui.background));
-	view_draw_threats(view_level_shift(level_current.lines.threats, level_next.lines.threats), threats);
-	view_draw_defenses(view_level_shift(level_current.lines.defenses, level_next.lines.defenses), defenses);
+	view_draw_background(view_level_shift(level_current.gui.background, level_next.gui.background, view_draw_game.timer));
+	view_draw_threats(view_level_shift(level_current.lines.threats, level_next.lines.threats, view_draw_game.timer), threats);
+	view_draw_defenses(view_level_shift(level_current.lines.defenses, level_next.lines.defenses, view_draw_game.timer), defenses);
 	view_draw_target(level_current.target.size,
-		view_level_shift(level_current.target.ring_1, level_next.target.ring_1),
-		view_level_shift(level_current.target.ring_2, level_next.target.ring_2));
+		view_level_shift(level_current.target.ring_1, level_next.target.ring_1, view_draw_game.timer),
+		view_level_shift(level_current.target.ring_2, level_next.target.ring_2, view_draw_game.timer));
 	
 	view_draw_footer('LEVEL: ' + level,
 		'LIVES: ' + lives,
@@ -101,7 +102,7 @@ function view_draw_threats(colour, list) {
 			Math.sin(list[i].angle) * trig,
 			Math.cos(list[i].angle) * list[i].distance,
 			Math.sin(list[i].angle) * list[i].distance,
-			(threats[i].life == -1) ? threats[i].life : --threats[i].life,
+			threats[i].life,
 			colour);
 	}
 }
@@ -117,17 +118,25 @@ function view_draw_defenses(colour, list) {
 			list[i].start.y,
 			list[i].end.x,
 			list[i].end.y,
-			(defenses[i].life == -1) ? defenses[i].life : --defenses[i].life,
+			defenses[i].life,
 			colour);
 	}
 }
 
 
 
-function view_draw_line(x1, y1, x2, y2, life, colour) {
-	context.strokeStyle = colour;
-	
+function view_draw_line(x1, y1, x2, y2, life, colour) {	
 	if (life == -1) {
+		context.strokeStyle = colour;
+		
+		context.beginPath();
+		context.moveTo(x1, y1);
+		context.lineTo(x2, y2);
+		context.stroke();
+		context.closePath();
+	} else {
+		context.strokeStyle = '';
+		
 		context.beginPath();
 		context.moveTo(x1, y1);
 		context.lineTo(x2, y2);
@@ -198,13 +207,14 @@ function view_draw_target(size, colour_1, colour_2) {
 /*
  * @param	data_component	initial hsla array
  * @param	shift_component	a fraction of the difference between current & next level
+ * @param	timer			number determining what stage it is at
  * @return					hsla string of initial component + shifted one
  */
-function view_level_shift(data_component, shift_component) {
-	return 'hsla(' + Math.ceil(data_component[0] + (shift_component[0] * level_shift_timer))
-		+ ', ' + Math.ceil(data_component[1] + (shift_component[1] * level_shift_timer))
-		+ '%, ' + Math.ceil(data_component[2] + (shift_component[2] * level_shift_timer))
-		+ '%, ' + Math.ceil(data_component[3] + (shift_component[3] * level_shift_timer))
+function view_level_shift(data_component, shift_component, timer) {
+	return 'hsla(' + Math.ceil(data_component[0] + (shift_component[0] * timer))
+		+ ', ' + Math.ceil(data_component[1] + (shift_component[1] * timer))
+		+ '%, ' + Math.ceil(data_component[2] + (shift_component[2] * timer))
+		+ '%, ' + Math.ceil(data_component[3] + (shift_component[3] * timer))
 		+ ')';
 }
 
