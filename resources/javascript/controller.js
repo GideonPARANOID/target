@@ -83,7 +83,7 @@ function control_game_set() {
 function control_game_pause() {
 	model_pause();
 	
-	control_menu('PAUSE', {
+	control_menu('PAUSE', null, {
 		selected : 0,
 		options : [{
 			title : 'UNPAUSE',
@@ -103,14 +103,15 @@ function control_game_pause() {
 
 
 
-
-function control_game_over() {
-
-
-	control_menu('GAME OVER', {
+/*
+ * @param level	
+ * @param score	
+ */
+function control_game_finalise(level, score) {
+	control_menu('GAME OVER', 'LEVEL: ' + level + ' SCORE: ' + score, {
 		options : [{
 			title : 'RETURN TO MENU',
-			functionality: control_men
+			functionality: control_menu_main
 		}],
 	}, null, null);
 }
@@ -131,7 +132,7 @@ function control_menu_high_scores() {
 
 
 function control_menu_main() {
-	control_menu('TARGET', {
+	control_menu('TARGET', null, {
 		selected : 1,
 		options : [{
 			title : 'ACHIEVEMENTS',
@@ -156,12 +157,13 @@ function control_menu_main() {
  * creates a menu screen based on the parameters, maximum of three menu options
  * resets controls and sets new ones, automatically does arrow keys & enter if menu items exist
  *
- * @param	title				the title of the menu
- * @param	menu_options			object describing menu options	{selected : index, options : [{title : string, functionality: function}]}
- * @param	keyboard_controls	object describing menu controls	[{key : string, description: string, functionality : function}]
- * @param	mouse_controls		object describing menu controls	{mousedown : function, mouseup : function, mousemove : function}
+ * @param title				string title of the menu
+ * @param text				string descriptor of the menu, displayed under the title
+ * @param menu_options		object describing menu options	{selected : index, options : [{title : string, functionality: function}]}
+ * @param keyboard_controls	object describing menu controls	[{key : string, description: string, functionality : function}]
+ * @param mouse_controls		object describing menu controls	{mousedown : function, mouseup : function, mousemove : function}
  */
-function control_menu(title, menu_options, keyboard_controls, mouse_controls) {
+function control_menu(title, text, menu_options, keyboard_controls, mouse_controls) {
 
 	// resetting
 	refresh_loop();
@@ -173,6 +175,7 @@ function control_menu(title, menu_options, keyboard_controls, mouse_controls) {
 		canvas.onmouseup	= 	(mouse_controls.onmouseup == undefined)	? null : mouse_controls.onmouseup;
 		canvas.onmousemove = (mouse_controls.onmousemove == undefined)	? null : mouse_controls.onmousemove;
 	}
+	
 	// setting keyboard controls
 	if (keyboard_controls != null) {
 		for (var i = 0; i < keyboard_controls.length; i++) {
@@ -210,7 +213,7 @@ function control_menu(title, menu_options, keyboard_controls, mouse_controls) {
 		clearInterval(control_menu.handle);
 		
 		control_menu.handle = setInterval(function() {
-			view_draw_gui(title, menu_options, keyboard_controls);
+			view_draw_gui(title, text, menu_options, keyboard_controls);
 		}, 30);
 	}
 }

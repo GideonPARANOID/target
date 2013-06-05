@@ -21,13 +21,10 @@ var gui = {
 var level_shift_timer = 0;
 var level_shift = 0;
 
-var TRIG;
-
 function view_draw_initialise() {
 	context.lineWidth = 5;
 
 	// constant - maximum distance from the center, for line length, pythagoras
-	TRIG = (((canvas.width / 2) ^ 2) + ((canvas.height / 2) ^ 2)) ^ .5;
 }
 
 
@@ -79,11 +76,12 @@ function view_draw_game(level_current, level_next, threats, defenses, level, liv
 
 
 /*
- * @param background		hsla background colour
+ * clears the canvas & paints it the colour specified
+ * @param background		hsla background colour, black if null
  */
 function view_draw_background(background) {
 	canvas.style.background = (background != null) ? background : 'hsla(0, 0%, 0%, 1)';
-	
+		
 	context.beginPath();
 	context.save();
 	context.setTransform(1, 0, 0, 1, 0, 0);
@@ -102,7 +100,7 @@ function view_draw_threats(colour, list) {
 	
 	for (var i = 0; i < threats.length; i++) {
 		context.beginPath();
-		context.moveTo(Math.cos(list[i].angle) * TRIG, Math.sin(list[i].angle) * TRIG);
+		context.moveTo(Math.cos(list[i].angle) * trig, Math.sin(list[i].angle) * trig);
 		context.lineTo(Math.cos(list[i].angle) * list[i].distance, Math.sin(list[i].angle) * list[i].distance);
 		context.stroke();
 		context.closePath();
@@ -214,16 +212,12 @@ function view_level_shift(data_component, shift_component) {
 
 
 /*
- * @param title	string for the large title at the top of the screen
+ * draws the title at the top of the screen
+ * @param title	string for the title
  */
 function view_draw_title(title) {
 	if (++gui.shift_1 > +canvas.width * .8) gui.shift_1 = -canvas.width;
 	if (--gui.shift_2 < -canvas.width * .8) gui.shift_2 = canvas.width;
-
-	view_draw_background();
-
-	context.fillStyle = 'hsla(0, 0%, 0%, 1)';
-	context.fillRect(-canvas.width * .5, -canvas.height * .4, canvas.width, canvas.height * .8);
 
 	context.fillStyle = 'hsla(0, 0%, 100%, 1)';
 	context.textAlign = 'center';
@@ -238,35 +232,22 @@ function view_draw_title(title) {
 
 
 
-/*
- * draws the footer of the screen displaying the strings passed
- * @param one	string for the furthest left item
- * @param two	string for the closest left item
- * @param three	string for the furthest right item
- * @param four	string for the closest right item
- */
-function view_draw_footer(one, two, three, four) {
-	context.textAlign = 'center';
-	context.textBaseline = 'bottom';
-	context.font = '25px wipeout';
-
-	context.fillStyle = 'hsla(0, 0%, 0%, 1)';
-	context.fillRect(-canvas.width * .5, canvas.height * .45, canvas.width, canvas.height * .1);
+function view_draw_text(text) {
 	context.fillStyle = 'hsla(0, 0%, 100%, 1)';
-
-	context.textAlign = 'right';
-	context.fillText(one, -canvas.width / 4, canvas.height * .5);
-	context.fillText(two, -canvas.width / 16, canvas.height * .5);
-
-	context.textAlign = 'left';
-	context.fillText(three, canvas.width / 16, canvas.height * .5);
-	context.fillText(four, canvas.width / 4, canvas.height * .5);
+	context.textAlign = 'center';
+	context.textBaseline = 'center';
+	context.font = '25px wipeout';
+	context.fillText(text, 0, 40);
 }
 
 
 
 
 
+/*
+ * draws the menu options, the selected option pulsates 
+ * @param menu_options	object describing menu options {selected : index, options : [{title : string, functionality: function}]}
+ */
 function view_draw_options(menu_options) {
 	if (menu_options != null) {
 		var options = ['', '', ''];
@@ -305,11 +286,30 @@ function view_draw_options(menu_options) {
 
 
 
-
-
-
-
-
+/*
+ * draws the footer of the screen displaying the strings passed
+ * @param one	string for the furthest left item
+ * @param two	string for the closest left item
+ * @param three	string for the furthest right item
+ * @param four	string for the closest right item
+ */
+function view_draw_footer(one, two, three, four) {
+	context.textAlign = 'center';
+	context.textBaseline = 'bottom';
+	context.font = '25px wipeout';
+	
+	context.fillStyle = 'hsla(0, 0%, 0%, 1)';
+	context.fillRect(-canvas.width * .5, canvas.height * .45, canvas.width, canvas.height * .1);
+	context.fillStyle = 'hsla(0, 0%, 100%, 1)';
+	
+	context.textAlign = 'right';
+	context.fillText(one, -canvas.width / 4, canvas.height * .5);
+	context.fillText(two, -canvas.width / 16, canvas.height * .5);
+	
+	context.textAlign = 'left';
+	context.fillText(three, canvas.width / 16, canvas.height * .5);
+	context.fillText(four, canvas.width / 4, canvas.height * .5);
+}
 
 
 
@@ -322,7 +322,7 @@ function view_draw_options(menu_options) {
  * @param 	menu_options			object describing menu options	{selected : index, options : [{title : string, functionality: function}]}
  * @param 	keyboard_controls	object describing menu controls	[{key : string, description: string, functionality : function}]
  */
-function view_draw_gui(title, menu_options, keyboard_controls) {
+function view_draw_gui(title, text, menu_options, keyboard_controls) {
 	var control_hints = ['', '', '', ''];
 
 	// drawing hints in the footer for keyboard controls
@@ -335,7 +335,13 @@ function view_draw_gui(title, menu_options, keyboard_controls) {
 	// selected option pulsing
 	(gui.up) ? ((gui.pulse == 255) ? gui.up = false : gui.pulse += 15) : ((gui.pulse == 0) ? gui.up = true : gui.pulse -= 15);
 
-	view_draw_title(title);
-	view_draw_options(menu_options);
-	view_draw_footer(control_hints[0], control_hints[1], control_hints[2], control_hints[3]);
+	view_draw_background();
+	
+	if (title != null)	view_draw_title(title);
+	if (text != null)	view_draw_text(text);
+	
+	if (menu_options != null)	{
+		view_draw_options(menu_options);
+		view_draw_footer(control_hints[0], control_hints[1], control_hints[2], control_hints[3]);
+	}
 }

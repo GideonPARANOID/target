@@ -43,38 +43,30 @@
 
 			<script type='text/javascript'>
 
-				//	This JavaScript is used to store the global variables operated on by the external files
-
+				// global variables
 				var canvas;
 				var context;
-
-				//	Game components
+				var trig;
 				var debug = true;
 
-				var game = false;
-				var level = 0;
 
 				//	Initialisation
 				window.onload = function() {
 					canvas = document.getElementById('main');
 					context = canvas.getContext('2d');
-					context.translate(canvas.width / 2, canvas.height / 2);	//	Everything is drawn from the center
+					context.translate(canvas.width / 2, canvas.height / 2); // everything is drawn from the center
+					trig = (((canvas.width / 2) ^ 2) + ((canvas.height / 2) ^ 2)) ^ .5;
 
 					model_levels_initialise();
 
-					
-					control_menu('TARGET', {
+					control_menu('TARGET', null, {
 						selected : 0,
 						options  : [{
 							title : 'PRESS ANY BUTTON TO START',
-							functionality : function () {
-								control_menu_main();
-							}
+							functionality : control_menu_main
 						}]},
 					null, {
-						onmousedown : function() {
-							control_menu_main();
-						}
+						onmousedown : control_menu_main
 					});
 				}
 

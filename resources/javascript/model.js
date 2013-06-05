@@ -63,9 +63,9 @@ function model_loop() {
  */
 function model_threat_add() {
 	threats.push({
-		speed : Math.ceil(level * 2 * Math.random()),
-		distance : (((canvas.width * .5) ^ 2) + ((canvas.height * .5) ^ 2)) ^ .5,
-		angle : Math.PI * 2* Math.random(),
+		speed : Math.ceil(level * 1.5 * Math.random()),
+		distance : trig,
+		angle : Math.PI * 2 * Math.random(),
 		life : -1
 	});
 
@@ -150,16 +150,6 @@ function model_life_lost() {
 }
 
 
-//	Game over refreshing
-function model_finalise() {
-	clearInterval(model_loop.handle);
-
-	if (debug) console.log('game end');
-}
-
-
-
-
 
 
 
@@ -228,8 +218,9 @@ function model_levels_initialise() {
 			level_data[i].speed = i * .5;			
 		}		
 	});
-
 }
+
+
 
 /*
  * if the game is running, pauses the game, if the game isn't running, continues
@@ -249,9 +240,13 @@ function model_pause() {
 
 
 
+/*
+ * closes the game
+ */
+function model_finalise() {
+	clearInterval(model_loop.handle);
 
-
-
-
-
-
+	control_game_finalise(level, score);
+	
+	if (debug) console.log('game end');
+}
