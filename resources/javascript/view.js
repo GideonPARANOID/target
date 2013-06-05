@@ -21,10 +21,13 @@ var gui = {
 var level_shift_timer = 0;
 var level_shift = 0;
 
-
+var TRIG;
 
 function view_draw_initialise() {
-	context.lineWidth = 5;	
+	context.lineWidth = 5;
+
+	// constant - maximum distance from the center, for line length, pythagoras
+	TRIG = (((canvas.width / 2) ^ 2) + ((canvas.height / 2) ^ 2)) ^ .5;
 }
 
 
@@ -133,10 +136,6 @@ function view_draw_defenses(colour, list) {
  * @param	colour_2		the colour of the outer ring
  */
 function view_draw_target(size, colour_1, colour_2) {
-	
-	// constant - maximum distance from the center, for line length, pythagoras
-	var TRIG = (((canvas.width / 2) ^ 2) + ((canvas.height / 2) ^ 2)) ^ .5;
-
 	// initialising 
 	if (view_draw_target.ring_1 == null) {
 		view_draw_target.ring_1 = 0;

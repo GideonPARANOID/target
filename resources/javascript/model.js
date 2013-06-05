@@ -35,7 +35,7 @@ function model_initialise() {
 
 
 
-var threat_timer;
+var threat_timer = 1;
 
 /*
  * main game loop
@@ -53,7 +53,7 @@ function model_loop() {
 	if (--threat_timer == 0) {
 		model_threat_add();
 
-		threat_timer = 3000 - (level * 200);
+		threat_timer = 90 - (level * 5);
 	}
 }
 
@@ -68,6 +68,8 @@ function model_threat_add() {
 		angle : Math.PI * 2* Math.random(),
 		life : -1
 	});
+
+	console.log('threat added');
 }
 
 
