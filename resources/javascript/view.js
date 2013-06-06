@@ -93,6 +93,7 @@ function view_draw_background(background) {
 
 
 /*
+ * draws a list of threat objects on the canvas
  * @param colour		colour of the threats
  * @param list		an array of threats
  */
@@ -109,6 +110,7 @@ function view_draw_threats(colour, list) {
 
 
 /*
+ * draws a list of defense objects on the canvas
  * @param colour		colour of the defenses
  * @param list		an array of defenses
  */
@@ -124,8 +126,12 @@ function view_draw_defenses(colour, list) {
 }
 
 
-
-function view_draw_line(x1, y1, x2, y2, life, colour) {	
+/*
+ * @param x1, y1, x2, y2	coordinates describing a line to draw
+ * @param life			how long the line has to live, -1 if alive
+ * @param colour			the colour for a fully living line
+ */
+function view_draw_line(x1, y1, x2, y2, life, colour) {
 	if (life == -1) {
 		context.strokeStyle = colour;
 		
@@ -206,16 +212,18 @@ function view_draw_target(size, colour_1, colour_2) {
 
 /*
  * @param	data_component	initial hsla array
- * @param	shift_component	a fraction of the difference between current & next level
+ * @param	shift_component	end component
  * @param	timer			number determining what stage it is at
- * @return					hsla string of initial component + shifted one
+ * @return					hsla string of initial component shifted by the component times the timer
  */
 function view_level_shift(data_component, shift_component, timer) {
-	return 'hsla(' + Math.ceil(data_component[0] + (shift_component[0] * timer))
-		+ ', ' + Math.ceil(data_component[1] + (shift_component[1] * timer))
-		+ '%, ' + Math.ceil(data_component[2] + (shift_component[2] * timer))
-		+ '%, ' + Math.ceil(data_component[3] + (shift_component[3] * timer))
-		+ ')';
+	var max = 30;
+	
+	return 'hsla(' + Math.ceil(data_component[0] + ((Math.abs(data_component[0] - shift_component[0]) / max) * timer))
+	+ ', ' + Math.ceil(data_component[1] + ((Math.abs(data_component[1] - shift_component[0]) / max) * timer))
+	+ '%, ' + Math.ceil(data_component[2] + ((Math.abs(data_component[2] - shift_component[2]) / max) * timer))
+	+ '%, ' + Math.ceil(data_component[3] + ((Math.abs(data_component[3] - shift_component[3]) / max) * timer))
+	+ ')';
 }
 
 

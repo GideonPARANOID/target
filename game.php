@@ -1,4 +1,4 @@
-<html>
+<!DOCTYPE html>
 	<head>
         <link type='text/css' rel='stylesheet' href='resources/main.css'>
         <link rel='icon' type='image/ico' href='resources/icon.ico'>
