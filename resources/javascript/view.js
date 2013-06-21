@@ -132,6 +132,8 @@ function view_draw_defenses(colour, list) {
  * @param colour			the colour for a fully living line
  */
 function view_draw_line(x1, y1, x2, y2, life, colour) {
+
+	// if living
 	if (life == -1) {
 		context.strokeStyle = colour;
 		
@@ -140,8 +142,12 @@ function view_draw_line(x1, y1, x2, y2, life, colour) {
 		context.lineTo(x2, y2);
 		context.stroke();
 		context.closePath();
+
+	// dying
 	} else {
 		context.strokeStyle = '';
+		context.lineWidth = 10 - ((30 - life) / 3);
+		
 		
 		context.beginPath();
 		context.moveTo(x1, y1);
@@ -149,6 +155,8 @@ function view_draw_line(x1, y1, x2, y2, life, colour) {
 		context.stroke();
 		context.closePath();
 	}
+	
+	context.lineWidth = 10;
 }
 
 

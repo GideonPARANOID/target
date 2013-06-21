@@ -102,7 +102,7 @@ function model_defense_add(x1, y1, x2, y2) {
  */
 function model_collision_detection() {
 	// looks a little unweildy, but isn't too bad
-	// worst case ~O(n^2)
+	// worst case ~O(n^2) - n = model/threats length
 	
 	for (var i = 0; i < threats.length; i++) {
 		if (threats[i].life == -1) {	
