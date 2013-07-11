@@ -7,9 +7,9 @@ var lives;
 var score;
 var player;	//	name from twitter sign in mayber or otherwise for server side leaderboards
 
-var level_data = new Array();		// level data
-var defenses = new Array();		// lines the player draws
-var threats = new Array();		// incoming lines
+var level_data = [];		// level data
+var defenses = [];		// lines the player draws
+var threats = [];		// incoming lines
 
 
 /*
